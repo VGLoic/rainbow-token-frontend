@@ -31,6 +31,7 @@
     "@types/node": "^16.11.25",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
+    "metamask-react": "^2.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "5.0.0",
@@ -40,7 +41,8 @@
   "devDependencies": {
     "husky": "^7.0.0",
     "lint-staged": "^11.1.2",
-    "prettier": "2.4.0"
+    "prettier": "2.4.0",
+    "eth-testing": "^1.1.0-alpha.6"
   },
   "lint-staged": {
     "src/**/*": "prettier --write --ignore-unknown",
