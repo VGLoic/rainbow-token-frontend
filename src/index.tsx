@@ -3,14 +3,14 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { CssBaseline } from "@mui/material";
-import ThemeProvider from "./providers/theme-provider";
+import AppProviders from "providers";
 
 ReactDOM.render(
   <React.StrictMode>
     <CssBaseline />
-    <ThemeProvider>
+    <AppProviders>
       <App />
-    </ThemeProvider>
+    </AppProviders>
   </React.StrictMode>,
   document.getElementById("root")
 );
