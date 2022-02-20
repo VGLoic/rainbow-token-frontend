@@ -5,11 +5,11 @@ import { contracts } from "rainbow-token-contracts";
 import App from "../App";
 
 describe("Networks", () => {
-  const { provider, testingUtils, generateContractUtils } = setupEthTesting({
+  const { provider, testingUtils } = setupEthTesting({
     providerType: "MetaMask",
   });
 
-  const rainbowTokenTestingUtils = generateContractUtils(
+  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
 
@@ -28,8 +28,9 @@ describe("Networks", () => {
   });
 
   test("user should be able to see the game only on supported networks", async () => {
-    testingUtils.mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"]);
-    testingUtils.mockChainId("0x1");
+    testingUtils
+      .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
+      .mockChainId("0x1");
 
     rainbowTokenTestingUtils.mockCall("isPlayer", [false]);
 

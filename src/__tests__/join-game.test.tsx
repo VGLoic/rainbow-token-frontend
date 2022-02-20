@@ -12,11 +12,11 @@ import { contracts } from "rainbow-token-contracts";
 import App from "../App";
 
 describe("Join the game", () => {
-  const { provider, testingUtils, generateContractUtils } = setupEthTesting({
+  const { provider, testingUtils } = setupEthTesting({
     providerType: "MetaMask",
   });
 
-  const rainbowTokenTestingUtils = generateContractUtils(
+  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
 
@@ -35,22 +35,28 @@ describe("Join the game", () => {
   });
 
   test("user should be able to join the game, then its informations should be displayed", async () => {
-    testingUtils.mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"]);
-    testingUtils.mockChainId("0x5");
+    testingUtils
+      .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
+      .mockChainId("0x5")
+      .mockBalance(
+        "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+        ethers.utils.parseUnits("1").toString()
+      );
 
-    rainbowTokenTestingUtils.mockCall("isPlayer", [false]);
-    rainbowTokenTestingUtils.mockTransaction("joinGame", undefined, {
-      triggerCallback: () => {
-        rainbowTokenTestingUtils.mockCall("isPlayer", [true]);
-        rainbowTokenTestingUtils.mockCall("getPlayer", [
-          [
-            { r: 123, g: 23, b: 124 },
-            { r: 0, g: 255, b: 255 },
-            ethers.utils.parseUnits("1", "ether"),
-          ],
-        ]);
-      },
-    });
+    rainbowTokenTestingUtils
+      .mockCall("isPlayer", [false])
+      .mockTransaction("joinGame", undefined, {
+        triggerCallback: () => {
+          rainbowTokenTestingUtils.mockCall("isPlayer", [true]);
+          rainbowTokenTestingUtils.mockCall("getPlayer", [
+            [
+              { r: 123, g: 23, b: 124 },
+              { r: 0, g: 255, b: 255 },
+              ethers.utils.parseUnits("1", "ether"),
+            ],
+          ]);
+        },
+      });
 
     render(<App />, { wrapper: AppProviders });
 
@@ -71,24 +77,40 @@ describe("Join the game", () => {
     await screen.findByText(/blending price: 1.0 ETH/i);
     await screen.findByText(/color: rgb\(123, 23, 124\)/i);
     await screen.findByText(/original color: rgb\(0, 255, 255\)/i);
+    await waitFor(() =>
+      expect(screen.getByText(/account balance/i)).toHaveTextContent(
+        "Account balance: 1.00 ETH"
+      )
+    );
   });
 
   test("user who is already a player should have its information displayed", async () => {
-    testingUtils.mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"]);
-    testingUtils.mockChainId("0x5");
-    rainbowTokenTestingUtils.mockCall("isPlayer", [true]);
-    rainbowTokenTestingUtils.mockCall("getPlayer", [
-      [
-        { r: 123, g: 23, b: 124 },
-        { r: 0, g: 255, b: 255 },
-        ethers.utils.parseUnits("1", "ether"),
-      ],
-    ]);
+    testingUtils
+      .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
+      .mockChainId("0x5")
+      .mockBalance(
+        "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+        ethers.utils.parseUnits("1").toString()
+      );
+    rainbowTokenTestingUtils
+      .mockCall("isPlayer", [true])
+      .mockCall("getPlayer", [
+        [
+          { r: 123, g: 23, b: 124 },
+          { r: 0, g: 255, b: 255 },
+          ethers.utils.parseUnits("1", "ether"),
+        ],
+      ]);
 
     render(<App />, { wrapper: AppProviders });
 
     await screen.findByText(/blending price: 1.0 ETH/i);
     await screen.findByText(/color: rgb\(123, 23, 124\)/i);
     await screen.findByText(/original color: rgb\(0, 255, 255\)/i);
+    await waitFor(() =>
+      expect(screen.getByText(/account balance/i)).toHaveTextContent(
+        "Account balance: 1.00 ETH"
+      )
+    );
   });
 });

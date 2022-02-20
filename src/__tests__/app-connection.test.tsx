@@ -11,11 +11,11 @@ import { contracts } from "rainbow-token-contracts";
 import App from "../App";
 
 describe("App connection", () => {
-  const { provider, testingUtils, generateContractUtils } = setupEthTesting({
+  const { provider, testingUtils } = setupEthTesting({
     providerType: "MetaMask",
   });
 
-  const rainbowTokenTestingUtils = generateContractUtils(
+  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
 
@@ -34,16 +34,14 @@ describe("App connection", () => {
   });
 
   test("user should be able to connect using MetaMask", async () => {
-    testingUtils.mockAccounts([]);
-    testingUtils.mockRequestAccounts(
-      ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
-      {
+    testingUtils
+      .mockAccounts([])
+      .mockRequestAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
         chainId: "0x1",
         triggerCallback: () => {
           rainbowTokenTestingUtils.mockCall("isPlayer", [false]);
         },
-      }
-    );
+      });
 
     render(<App />, { wrapper: AppProviders });
 
