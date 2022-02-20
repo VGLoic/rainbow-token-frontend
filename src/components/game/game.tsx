@@ -59,7 +59,15 @@ function Game() {
           },
         }}
       >
-        <AccountSpecifics />
+        <AccountSpecifics
+          style={{
+            marginBottom: "16px",
+            [theme.breakpoints.down("sm")]: {
+              marginBottom: 0,
+              marginRight: "16px",
+            },
+          }}
+        />
         <GameSpecifics />
       </Box>
     </Box>

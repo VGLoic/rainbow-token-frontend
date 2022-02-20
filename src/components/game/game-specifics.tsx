@@ -1,9 +1,10 @@
 import * as React from "react";
 import { ethers } from "ethers";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper, SxProps, Typography } from "@mui/material";
 import { useConnectedMetaMask } from "metamask-react";
 import { contracts, RainbowToken__factory } from "rainbow-token-contracts";
 import { useQuery } from "react-query";
+import Balance from "components/balance";
 
 function useRainbowToken() {
   const { ethereum, chainId } = useConnectedMetaMask();
@@ -17,48 +18,29 @@ function useRainbowToken() {
   return contract;
 }
 
-function useProvider() {
-  const { ethereum, chainId } = useConnectedMetaMask();
-  return React.useMemo(() => {
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    return provider;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereum, chainId]);
-}
-
-function GameSpecifics() {
+type GameSpecificsProps = {
+  style?: SxProps;
+};
+function GameSpecifics({ style }: GameSpecificsProps) {
   const rainbowToken = useRainbowToken();
-  const provider = useProvider();
 
   const targetColorQuery = useQuery("targetColor", () =>
     rainbowToken.getTargetColor()
   );
-  const contractBalanceQuery = useQuery(
-    "contractBalance",
-    () => provider.getBalance(rainbowToken.address),
-    {
-      refetchInterval: 1000,
-    }
-  );
-
-  const globalSuccess =
-    targetColorQuery.status === "success" &&
-    contractBalanceQuery.status === "success";
 
   return (
-    <Paper>
-      <Typography component="h2" variant="h6">
+    <Paper sx={{ padding: "16px", ...style }}>
+      <Typography component="h2" variant="h6" mb="8px">
         Game Specifics
       </Typography>
-      {globalSuccess ? (
+      {targetColorQuery.status === "success" ? (
         <Box>
           <Typography>
             Target color: RGB({targetColorQuery.data.r},{" "}
             {targetColorQuery.data.g}, {targetColorQuery.data.b})
           </Typography>
           <Typography>
-            Contract balance:{" "}
-            {ethers.utils.formatUnits(contractBalanceQuery.data, "ether")} ETH{" "}
+            Contract balance: <Balance account={rainbowToken.address} />
           </Typography>
         </Box>
       ) : null}

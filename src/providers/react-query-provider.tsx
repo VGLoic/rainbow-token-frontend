@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "react-query";
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({});
 
 type RQProviderProps = any;
 function RQProvider(props: RQProviderProps) {

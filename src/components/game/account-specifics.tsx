@@ -1,10 +1,11 @@
 import * as React from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper, SxProps, Typography } from "@mui/material";
 import { useConnectedMetaMask } from "metamask-react";
 import { contracts, RainbowToken__factory } from "rainbow-token-contracts";
 import { BigNumberish, ethers } from "ethers";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { ENTRY_FEE } from "constants/rainbow-token";
+import Balance from "components/balance";
 
 function useRainbowToken() {
   const { ethereum, chainId } = useConnectedMetaMask();
@@ -24,7 +25,10 @@ function JoinGame() {
   const queryClient = useQueryClient();
 
   const { status, mutate } = useMutation(
-    () => rainbowToken.joinGame({ value: ENTRY_FEE }),
+    () =>
+      rainbowToken
+        .joinGame({ value: ENTRY_FEE.toHexString() })
+        .then((tx) => tx.wait()),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["isPlayer"]);
@@ -81,11 +85,17 @@ function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
         Original color: RGB({player.originalColor.r}, {player.originalColor.g},{" "}
         {player.originalColor.b})
       </Typography>
+      <Typography>
+        Account balance: <Balance account={account} />
+      </Typography>
     </Box>
   );
 }
 
-function AccountSpecifics() {
+type AccountSpecificsProps = {
+  style?: SxProps;
+};
+function AccountSpecifics({ style }: AccountSpecificsProps) {
   const { account } = useConnectedMetaMask();
   const rainbowToken = useRainbowToken();
 
@@ -96,8 +106,8 @@ function AccountSpecifics() {
   const isPlayer = status === "success" && Boolean(data);
 
   return (
-    <Paper>
-      <Typography component="h2" variant="h6">
+    <Paper sx={{ padding: "16px", ...style }}>
+      <Typography component="h2" variant="h6" mb="8px">
         Account Specifics
       </Typography>
       {isPlayer ? <RainbowTokenAccount account={account} /> : <JoinGame />}
