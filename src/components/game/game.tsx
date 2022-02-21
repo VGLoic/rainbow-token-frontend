@@ -1,25 +1,9 @@
-import { Box, Paper, useTheme } from "@mui/material";
-import { contracts } from "rainbow-token-contracts";
+import { Box, useTheme } from "@mui/material";
 import { useMetaMask } from "metamask-react";
 import AccountSpecifics from "./account-specifics";
 import GameSpecifics from "./game-specifics";
-
-function Players() {
-  const theme = useTheme();
-  return (
-    <Paper
-      sx={{
-        height: "100%",
-        flex: 3,
-        [theme.breakpoints.down("sm")]: {
-          width: "100%",
-        },
-      }}
-    >
-      Player tables
-    </Paper>
-  );
-}
+import Players from "components/players";
+import { isChainIdSupported } from "constants/chainid-map";
 
 function Game() {
   const theme = useTheme();
@@ -27,7 +11,7 @@ function Game() {
 
   if (status !== "connected") return null;
 
-  if (!contracts.rainbowToken.isNetworkSupported(Number(chainId))) return null;
+  if (!isChainIdSupported(Number(chainId))) return null;
 
   return (
     <Box
@@ -35,7 +19,7 @@ function Game() {
         height: "calc(100% - 64px)",
         display: "flex",
         padding: "64px",
-        [theme.breakpoints.down("sm")]: {
+        [theme.breakpoints.down("md")]: {
           padding: "48px",
           flexDirection: "column-reverse",
           alignItems: "center",
@@ -50,7 +34,7 @@ function Game() {
           display: "flex",
           flexDirection: "column",
           marginLeft: "48px",
-          [theme.breakpoints.down("sm")]: {
+          [theme.breakpoints.down("md")]: {
             width: "100%",
             marginLeft: "0",
             flexDirection: "row",
@@ -62,7 +46,7 @@ function Game() {
         <AccountSpecifics
           style={{
             marginBottom: "16px",
-            [theme.breakpoints.down("sm")]: {
+            [theme.breakpoints.down("md")]: {
               marginBottom: 0,
               marginRight: "16px",
             },

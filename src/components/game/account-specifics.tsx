@@ -3,9 +3,10 @@ import { Box, Button, Paper, SxProps, Typography } from "@mui/material";
 import { useConnectedMetaMask } from "metamask-react";
 import { contracts, RainbowToken__factory } from "rainbow-token-contracts";
 import { BigNumberish, ethers } from "ethers";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { ENTRY_FEE } from "constants/rainbow-token";
 import Balance from "components/balance";
+import { useIsPlayer, usePlayer } from "hooks";
 
 function useRainbowToken() {
   const { ethereum, chainId } = useConnectedMetaMask();
@@ -27,7 +28,8 @@ function JoinGame() {
   const { status, mutate } = useMutation(
     () =>
       rainbowToken
-        .joinGame({ value: ENTRY_FEE.toHexString() })
+        // TODO: REMIND ME TO FIX THIS PROBLEM
+        .joinGame({ value: ENTRY_FEE.toHexString(), gasLimit: "100870" })
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
@@ -47,26 +49,11 @@ type RainbowTokenAccountProps = {
   account: string;
 };
 function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
-  const rainbowToken = useRainbowToken();
-  const { status, data } = useQuery(["player", { account }], () =>
-    rainbowToken.getPlayer(account)
-  );
+  const playerQuery = usePlayer(account);
 
-  if (status !== "success") return null;
+  if (playerQuery.status !== "success") return null;
 
-  const player = {
-    blendingPrice: data?.[2],
-    color: {
-      r: data?.[0].r,
-      g: data?.[0].g,
-      b: data?.[0].b,
-    },
-    originalColor: {
-      r: data?.[1].r,
-      g: data?.[1].g,
-      b: data?.[1].b,
-    },
-  };
+  const player = playerQuery.data;
 
   return (
     <Box>
@@ -97,20 +84,18 @@ type AccountSpecificsProps = {
 };
 function AccountSpecifics({ style }: AccountSpecificsProps) {
   const { account } = useConnectedMetaMask();
-  const rainbowToken = useRainbowToken();
-
-  const { data, status } = useQuery(["isPlayer", { account }], () =>
-    rainbowToken.isPlayer(account)
-  );
-
-  const isPlayer = status === "success" && Boolean(data);
+  const { status, isPlayer } = useIsPlayer(account);
 
   return (
     <Paper sx={{ padding: "16px", ...style }}>
       <Typography component="h2" variant="h6" mb="8px">
         Account Specifics
       </Typography>
-      {isPlayer ? <RainbowTokenAccount account={account} /> : <JoinGame />}
+      {status !== "success" ? null : isPlayer ? (
+        <RainbowTokenAccount account={account} />
+      ) : (
+        <JoinGame />
+      )}
     </Paper>
   );
 }

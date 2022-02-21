@@ -1,3 +1,5 @@
+import { contracts } from "rainbow-token-contracts";
+
 export const chainIdMap: Record<string, string> = {
   1: "Ethereum",
   3: "Ropsten",
@@ -13,4 +15,13 @@ export function getChainName(chainId: string) {
   const chainName = chainIdMap[Number(chainId)];
   if (chainName) return chainName;
   return "Unknown";
+}
+
+export function isChainIdSupported(chainId: number) {
+  const isDeployed = contracts.rainbowToken.isNetworkSupported(chainId);
+  if (process.env.NODE_ENV === "development") {
+    return isDeployed;
+  }
+  const isLocalhost = chainId === 31337;
+  return isDeployed && !isLocalhost;
 }
