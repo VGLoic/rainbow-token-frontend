@@ -1,27 +1,13 @@
 import * as React from "react";
 import { Box, Button, Paper, SxProps, Typography } from "@mui/material";
 import { useConnectedMetaMask } from "metamask-react";
-import { contracts, RainbowToken__factory } from "rainbow-token-contracts";
 import { BigNumberish, ethers } from "ethers";
 import { useMutation, useQueryClient } from "react-query";
 import { ENTRY_FEE } from "constants/rainbow-token";
 import Balance from "components/balance";
-import { useIsPlayer, usePlayer } from "hooks";
+import { useIsPlayer, usePlayer, useRainbowToken } from "hooks";
 import SelfBlend from "./self-blend";
 import EditBlendingPrice from "./edit-blending-price";
-
-function useRainbowToken() {
-  const { ethereum, chainId } = useConnectedMetaMask();
-  const contract = React.useMemo(() => {
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    return RainbowToken__factory.connect(
-      contracts.rainbowToken.getNetworkConfiguration(Number(chainId)).address,
-      signer
-    );
-  }, [ethereum, chainId]);
-  return contract;
-}
 
 function JoinGame() {
   const rainbowToken = useRainbowToken();
