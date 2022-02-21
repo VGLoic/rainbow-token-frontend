@@ -43,17 +43,24 @@ describe("Join the game", () => {
         ethers.utils.parseUnits("1").toString()
       );
 
+    // REMIND ME
+    testingUtils.lowLevel.mockRequest("eth_blockNumber", "0x01");
+
     rainbowTokenTestingUtils
       .mockCall("isPlayer", [false])
       .mockTransaction("joinGame", undefined, {
         triggerCallback: () => {
           rainbowTokenTestingUtils.mockCall("isPlayer", [true]);
           rainbowTokenTestingUtils.mockCall("getPlayer", [
-            [
-              { r: 123, g: 23, b: 124 },
-              { r: 0, g: 255, b: 255 },
-              ethers.utils.parseUnits("1", "ether"),
-            ],
+            {
+              color: {
+                r: 123,
+                g: 23,
+                b: 124,
+              },
+              originalColor: { r: 0, g: 255, b: 255 },
+              blendingPrice: ethers.utils.parseUnits("1", "ether"),
+            },
           ]);
         },
       });

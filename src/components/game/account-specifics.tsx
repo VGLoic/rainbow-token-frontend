@@ -29,7 +29,7 @@ function JoinGame() {
     () =>
       rainbowToken
         // TODO: REMIND ME TO FIX THIS PROBLEM
-        .joinGame({ value: ENTRY_FEE.toHexString(), gasLimit: "100870" })
+        .joinGame({ value: ENTRY_FEE.toHexString(), gasLimit: "0x18a06" })
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
