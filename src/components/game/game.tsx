@@ -2,7 +2,7 @@ import { Box, useTheme } from "@mui/material";
 import { useMetaMask } from "metamask-react";
 import AccountSpecifics from "./account-specifics";
 import GameSpecifics from "./game-specifics";
-import Players from "components/players";
+import Players from "./players";
 import { isChainIdSupported } from "constants/chainid-map";
 
 function Game() {
