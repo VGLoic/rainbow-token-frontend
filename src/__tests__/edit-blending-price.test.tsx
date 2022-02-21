@@ -43,6 +43,7 @@ describe("Edit blending price", () => {
         ethers.utils.parseUnits("1").toString()
       );
 
+    // REMIND ME
     testingUtils.lowLevel.mockRequest("eth_blockNumber", "0x01");
 
     rainbowTokenTestingUtils
