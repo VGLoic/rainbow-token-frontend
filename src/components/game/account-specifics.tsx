@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from "react-query";
 import { ENTRY_FEE } from "constants/rainbow-token";
 import Balance from "components/balance";
 import { useIsPlayer, usePlayer } from "hooks";
+import SelfBlend from "./self-blend";
+import EditBlendingPrice from "./edit-blending-price";
 
 function useRainbowToken() {
   const { ethereum, chainId } = useConnectedMetaMask();
@@ -67,14 +69,14 @@ function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
           player.blendingPrice as BigNumberish,
           "ether"
         )}{" "}
-        ETH{" "}
+        ETH <EditBlendingPrice player={player} />
       </Typography>
       <Typography>
         Color: RGB({player.color.r}, {player.color.g}, {player.color.b})
       </Typography>
       <Typography>
         Original color: RGB({player.originalColor.r}, {player.originalColor.g},{" "}
-        {player.originalColor.b})
+        {player.originalColor.b}) <SelfBlend player={player} />
       </Typography>
       <Typography>
         Account balance: <Balance account={account} />
