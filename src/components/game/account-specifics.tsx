@@ -39,7 +39,11 @@ function JoinGame() {
   );
 
   return (
-    <Button variant="contained" onClick={() => mutate()}>
+    <Button
+      variant="contained"
+      onClick={() => mutate()}
+      disabled={status === "loading"}
+    >
       {status === "loading" ? "Joining..." : "Join the Game"}
     </Button>
   );
