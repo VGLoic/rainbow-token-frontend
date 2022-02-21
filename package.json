@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "author": "Loïc Vincent-Genod (https://github.com/VGLoic)",
-  "homepage": "https://github.com/VGLoic/rainbow-token-frontend",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/VGLoic/rainbow-token-frontend.git"
