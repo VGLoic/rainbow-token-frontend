@@ -1,24 +1,9 @@
-import { render, screen, act } from "@testing-library/react";
+import { screen, act } from "@testing-library/react";
 import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
-import AppProviders from "providers";
 import { contracts } from "rainbow-token-contracts";
-import { useMetaMask } from "metamask-react";
 import Players from "components/game/players";
-
-function TestWrapper(props: any) {
-  const { status } = useMetaMask();
-  if (status !== "connected") return null;
-  return props.children;
-}
-
-function TestProviders(props: any) {
-  return (
-    <AppProviders>
-      <TestWrapper {...props} />
-    </AppProviders>
-  );
-}
+import { connectedRender } from "testing-utils";
 
 describe("Display player list", () => {
   const { provider, testingUtils } = setupEthTesting({
@@ -102,7 +87,7 @@ describe("Display player list", () => {
         ],
       ]);
 
-    render(<Players />, { wrapper: TestProviders });
+    await connectedRender(<Players />);
 
     await screen.findByRole("table", { name: /players table/i });
 

@@ -1,9 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import App from "App";
 import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
-import AppProviders from "providers";
 import { contracts } from "rainbow-token-contracts";
+import { connectedRender } from "testing-utils";
 
 describe("Game specifics display", () => {
   const { provider, testingUtils } = setupEthTesting({
@@ -52,7 +52,7 @@ describe("Game specifics display", () => {
         },
       ]);
 
-    render(<App />, { wrapper: AppProviders });
+    await connectedRender(<App />);
 
     await screen.findByText(/target color: rgb\(125, 12, 87\)/i);
     await waitFor(() =>
