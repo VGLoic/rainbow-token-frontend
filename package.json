@@ -33,7 +33,7 @@
     "@types/react-dom": "^17.0.11",
     "ethers": "^5.5.4",
     "metamask-react": "^2.2.1",
-    "rainbow-token-contracts": "1.4.1",
+    "rainbow-token-contracts": "1.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.34.15",
@@ -42,7 +42,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "eth-testing": "^1.1.0-alpha.15",
+    "eth-testing": "^1.1.0-alpha.16",
     "husky": "^7.0.0",
     "lint-staged": "^11.1.2",
     "prettier": "2.4.0"

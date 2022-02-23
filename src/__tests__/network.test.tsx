@@ -1,7 +1,7 @@
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { screen, act } from "@testing-library/react";
 import { setupEthTesting } from "eth-testing";
-import AppProviders from "providers";
 import { contracts } from "rainbow-token-contracts";
+import { connectedRender } from "testing-utils";
 import App from "../App";
 
 describe("Networks", () => {
@@ -34,11 +34,9 @@ describe("Networks", () => {
 
     rainbowTokenTestingUtils.mockCall("isPlayer", [false]);
 
-    render(<App />, { wrapper: AppProviders });
+    await connectedRender(<App />);
 
-    await waitFor(() => {
-      expect(screen.getByText(/ethereum/i)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/ethereum/i)).toBeInTheDocument();
     expect(screen.getByText("0xA6d...5af")).toBeInTheDocument();
 
     expect(

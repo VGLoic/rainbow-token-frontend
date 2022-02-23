@@ -1,24 +1,9 @@
-import { render, screen, act } from "@testing-library/react";
+import { screen, act } from "@testing-library/react";
 import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
-import AppProviders from "providers";
 import { contracts } from "rainbow-token-contracts";
-import { useMetaMask } from "metamask-react";
 import Players from "components/game/players";
-
-function TestWrapper(props: any) {
-  const { status } = useMetaMask();
-  if (status !== "connected") return null;
-  return props.children;
-}
-
-function TestProviders(props: any) {
-  return (
-    <AppProviders>
-      <TestWrapper {...props} />
-    </AppProviders>
-  );
-}
+import { connectedRender } from "testing-utils";
 
 describe("Display player list", () => {
   const { provider, testingUtils } = setupEthTesting({
@@ -69,9 +54,17 @@ describe("Display player list", () => {
         { callValues: ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"] },
         { persistent: true }
       )
-      .mockCall(
-        "getPlayer",
+      .mockCall("getPlayers", [
         [
+          {
+            color: {
+              r: 123,
+              g: 23,
+              b: 124,
+            },
+            originalColor: { r: 0, g: 255, b: 255 },
+            blendingPrice: ethers.utils.parseUnits("1", "ether"),
+          },
           {
             color: {
               r: 12,
@@ -82,9 +75,7 @@ describe("Display player list", () => {
             blendingPrice: ethers.utils.parseUnits("1.1", "ether"),
           },
         ],
-        { callValues: ["0x3E61338c1a69B0d2642314C9fc6936F0B117D284"] },
-        { persistent: true }
-      )
+      ])
       .mockGetLogs("PlayerJoined", [
         [
           "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
@@ -96,9 +87,11 @@ describe("Display player list", () => {
         ],
       ]);
 
-    render(<Players />, { wrapper: TestProviders });
+    await connectedRender(<Players />);
 
-    await screen.findByRole("table", { name: /players table/i });
+    expect(
+      screen.getByRole("table", { name: /players table/i })
+    ).toBeInTheDocument();
 
     await screen.findByText(/0xA6d...5af/i);
     await screen.findByText(/rgb\(123, 23, 124\)/i);

@@ -1,5 +1,4 @@
 import {
-  render,
   screen,
   waitFor,
   waitForElementToBeRemoved,
@@ -7,8 +6,8 @@ import {
 import userEvent from "@testing-library/user-event";
 import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
-import AppProviders from "providers";
 import { contracts } from "rainbow-token-contracts";
+import { connectedRender } from "testing-utils";
 import App from "../App";
 
 describe("Join the game", () => {
@@ -63,7 +62,7 @@ describe("Join the game", () => {
         },
       });
 
-    render(<App />, { wrapper: AppProviders });
+    await connectedRender(<App />);
 
     await waitFor(() => {
       expect(
@@ -111,7 +110,7 @@ describe("Join the game", () => {
         },
       ]);
 
-    render(<App />, { wrapper: AppProviders });
+    await connectedRender(<App />);
 
     await screen.findByText(/blending price: 1.0 ETH/i);
     await screen.findByText(/color: rgb\(123, 23, 124\)/i);
