@@ -13,7 +13,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --cache false",
     "eject": "react-scripts eject",
     "lint": "eslint src",
     "format": "prettier src --write",
@@ -41,7 +41,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "eth-testing": "^1.1.0-alpha.13",
+    "eth-testing": "^1.1.0-alpha.15",
     "husky": "^7.0.0",
     "lint-staged": "^11.1.2",
     "prettier": "2.4.0"

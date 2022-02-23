@@ -35,9 +35,8 @@ describe("App connection", () => {
 
   test("user should be able to connect using MetaMask", async () => {
     testingUtils
-      .mockAccounts([])
+      .mockNotConnectedWallet()
       .mockRequestAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
-        chainId: "0x1",
         triggerCallback: () => {
           rainbowTokenTestingUtils.mockCall("isPlayer", [false]);
         },

@@ -78,6 +78,7 @@ function usePlayers() {
       blendingPrice: BigNumber,
       _: unknown
     ) => {
+      console.log("Coucou from onBlendingPriceUpdated");
       const updater = (currentPlayers: Player[] | undefined): Player[] => {
         if (!currentPlayers) return [];
         return currentPlayers.map((player) => {

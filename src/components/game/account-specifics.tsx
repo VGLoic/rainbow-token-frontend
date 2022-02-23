@@ -16,7 +16,7 @@ function JoinGame() {
   const { status, mutate } = useMutation(
     () =>
       rainbowToken
-        // TODO: REMIND ME TO FIX THIS PROBLEM
+        // TODO: Fix the manual input of gas limit
         .joinGame({ value: ENTRY_FEE.toHexString(), gasLimit: "0x18a06" })
         .then((tx) => tx.wait()),
     {

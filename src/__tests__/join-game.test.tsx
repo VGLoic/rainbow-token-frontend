@@ -36,15 +36,13 @@ describe("Join the game", () => {
 
   test("user should be able to join the game, then its informations should be displayed", async () => {
     testingUtils
-      .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
-      .mockChainId("0x5")
+      .mockConnectedWallet(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
+        chainId: "0x5",
+      })
       .mockBalance(
         "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
         ethers.utils.parseUnits("1").toString()
       );
-
-    // REMIND ME
-    testingUtils.lowLevel.mockRequest("eth_blockNumber", "0x01");
 
     rainbowTokenTestingUtils
       .mockCall("isPlayer", [false])

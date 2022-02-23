@@ -28,9 +28,9 @@ describe("Networks", () => {
   });
 
   test("user should be able to see the game only on supported networks", async () => {
-    testingUtils
-      .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
-      .mockChainId("0x1");
+    testingUtils.mockConnectedWallet([
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+    ]);
 
     rainbowTokenTestingUtils.mockCall("isPlayer", [false]);
 
