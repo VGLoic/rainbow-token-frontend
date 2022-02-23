@@ -13,7 +13,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --cache false",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src",
     "format": "prettier src --write",
