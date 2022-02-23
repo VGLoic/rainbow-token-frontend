@@ -1,24 +1,13 @@
 import * as React from "react";
 import { Box, Button, Paper, SxProps, Typography } from "@mui/material";
 import { useConnectedMetaMask } from "metamask-react";
-import { contracts, RainbowToken__factory } from "rainbow-token-contracts";
 import { BigNumberish, ethers } from "ethers";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { ENTRY_FEE } from "constants/rainbow-token";
 import Balance from "components/balance";
-
-function useRainbowToken() {
-  const { ethereum, chainId } = useConnectedMetaMask();
-  const contract = React.useMemo(() => {
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    return RainbowToken__factory.connect(
-      contracts.rainbowToken.getNetworkConfiguration(Number(chainId)).address,
-      signer
-    );
-  }, [ethereum, chainId]);
-  return contract;
-}
+import { useIsPlayer, usePlayer, useRainbowToken } from "hooks";
+import SelfBlend from "./self-blend";
+import EditBlendingPrice from "./edit-blending-price";
 
 function JoinGame() {
   const rainbowToken = useRainbowToken();
@@ -27,7 +16,8 @@ function JoinGame() {
   const { status, mutate } = useMutation(
     () =>
       rainbowToken
-        .joinGame({ value: ENTRY_FEE.toHexString() })
+        // TODO: Fix the manual input of gas limit
+        .joinGame({ value: ENTRY_FEE.toHexString(), gasLimit: "0x18a06" })
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
@@ -37,7 +27,11 @@ function JoinGame() {
   );
 
   return (
-    <Button variant="contained" onClick={() => mutate()}>
+    <Button
+      variant="contained"
+      onClick={() => mutate()}
+      disabled={status === "loading"}
+    >
       {status === "loading" ? "Joining..." : "Join the Game"}
     </Button>
   );
@@ -47,26 +41,11 @@ type RainbowTokenAccountProps = {
   account: string;
 };
 function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
-  const rainbowToken = useRainbowToken();
-  const { status, data } = useQuery(["player", { account }], () =>
-    rainbowToken.getPlayer(account)
-  );
+  const playerQuery = usePlayer(account);
 
-  if (status !== "success") return null;
+  if (playerQuery.status !== "success") return null;
 
-  const player = {
-    blendingPrice: data?.[2],
-    color: {
-      r: data?.[0].r,
-      g: data?.[0].g,
-      b: data?.[0].b,
-    },
-    originalColor: {
-      r: data?.[1].r,
-      g: data?.[1].g,
-      b: data?.[1].b,
-    },
-  };
+  const player = playerQuery.data;
 
   return (
     <Box>
@@ -76,14 +55,14 @@ function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
           player.blendingPrice as BigNumberish,
           "ether"
         )}{" "}
-        ETH{" "}
+        ETH <EditBlendingPrice player={player} />
       </Typography>
       <Typography>
         Color: RGB({player.color.r}, {player.color.g}, {player.color.b})
       </Typography>
       <Typography>
         Original color: RGB({player.originalColor.r}, {player.originalColor.g},{" "}
-        {player.originalColor.b})
+        {player.originalColor.b}) <SelfBlend player={player} />
       </Typography>
       <Typography>
         Account balance: <Balance account={account} />
@@ -97,20 +76,18 @@ type AccountSpecificsProps = {
 };
 function AccountSpecifics({ style }: AccountSpecificsProps) {
   const { account } = useConnectedMetaMask();
-  const rainbowToken = useRainbowToken();
-
-  const { data, status } = useQuery(["isPlayer", { account }], () =>
-    rainbowToken.isPlayer(account)
-  );
-
-  const isPlayer = status === "success" && Boolean(data);
+  const { status, isPlayer } = useIsPlayer(account);
 
   return (
     <Paper sx={{ padding: "16px", ...style }}>
       <Typography component="h2" variant="h6" mb="8px">
         Account Specifics
       </Typography>
-      {isPlayer ? <RainbowTokenAccount account={account} /> : <JoinGame />}
+      {status !== "success" ? null : isPlayer ? (
+        <RainbowTokenAccount account={account} />
+      ) : (
+        <JoinGame />
+      )}
     </Paper>
   );
 }

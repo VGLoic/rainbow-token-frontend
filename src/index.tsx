@@ -7,8 +7,8 @@ import AppProviders from "providers";
 
 ReactDOM.render(
   <React.StrictMode>
-    <CssBaseline />
     <AppProviders>
+      <CssBaseline />
       <App />
     </AppProviders>
   </React.StrictMode>,

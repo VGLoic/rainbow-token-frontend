@@ -33,8 +33,9 @@ describe("Game specifics display", () => {
 
   test("a connected user should be able to see the game informations", async () => {
     testingUtils
-      .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
-      .mockChainId("0x5")
+      .mockConnectedWallet(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
+        chainId: "0x5",
+      })
       .mockBalance(
         "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
         ethers.utils.parseUnits("1").toString()

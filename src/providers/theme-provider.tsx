@@ -1,6 +1,10 @@
 import { createTheme, ThemeProvider as MuiThemeProvider } from "@mui/material";
 
-const theme = createTheme({});
+const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 type ThemeProviderProps = any;
 function ThemeProvider(props: ThemeProviderProps) {
