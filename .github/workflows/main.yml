@@ -20,4 +20,20 @@ jobs:
       - run: npm install
       - run: npm test
       - run: npm run build
-        
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Coverage
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          cache: npm
+      - run: npm install
+      - run: npm run test:cover
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

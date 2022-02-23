@@ -1,5 +1,6 @@
 # Rainbow Token Frontend
 
+[![Coverage Status](https://coveralls.io/repos/github/VGLoic/rainbow-token-frontend/badge.svg?branch=main)](https://coveralls.io/github/VGLoic/rainbow-token-frontend?branch=main)
 
 ## Setup
 
