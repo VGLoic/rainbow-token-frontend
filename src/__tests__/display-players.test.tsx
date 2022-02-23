@@ -89,7 +89,9 @@ describe("Display player list", () => {
 
     await connectedRender(<Players />);
 
-    await screen.findByRole("table", { name: /players table/i });
+    expect(
+      screen.getByRole("table", { name: /players table/i })
+    ).toBeInTheDocument();
 
     await screen.findByText(/0xA6d...5af/i);
     await screen.findByText(/rgb\(123, 23, 124\)/i);

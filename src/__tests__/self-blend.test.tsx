@@ -2,6 +2,7 @@ import {
   screen,
   waitFor,
   waitForElementToBeRemoved,
+  within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { setupEthTesting } from "eth-testing";
@@ -55,22 +56,7 @@ describe("Self blend", () => {
           originalColor: { r: 0, g: 255, b: 255 },
           blendingPrice: ethers.utils.parseUnits("1", "ether"),
         },
-      ])
-      .mockTransaction("selfBlend", undefined, {
-        triggerCallback: () => {
-          rainbowTokenTestingUtils.mockCall("getPlayer", [
-            {
-              color: {
-                r: 61,
-                g: 139,
-                b: 189,
-              },
-              originalColor: { r: 0, g: 255, b: 255 },
-              blendingPrice: ethers.utils.parseUnits("1.0", "ether"),
-            },
-          ]);
-        },
-      });
+      ]);
 
     await connectedRender(<App />);
 
@@ -85,12 +71,10 @@ describe("Self blend", () => {
 
     userEvent.click(screen.getByRole("button", { name: /self blend/i }));
 
-    expect(
-      screen.getByRole("dialog", {
-        name: /self blend/i,
-        hidden: false,
-      })
-    ).toBeInTheDocument();
+    const dialog = await screen.findByRole("dialog", {
+      name: /self blend/i,
+      hidden: false,
+    });
 
     expect(
       screen.getByText(/my color: rgb\(123, 23, 124\)/i)
@@ -102,9 +86,25 @@ describe("Self blend", () => {
       screen.getByText(/my new color: rgb\(61, 139, 189\)/i)
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole("button", { name: /blend/i }));
+    rainbowTokenTestingUtils.mockTransaction("selfBlend", undefined, {
+      triggerCallback: () => {
+        rainbowTokenTestingUtils.mockCall("getPlayer", [
+          {
+            color: {
+              r: 61,
+              g: 139,
+              b: 189,
+            },
+            originalColor: { r: 0, g: 255, b: 255 },
+            blendingPrice: ethers.utils.parseUnits("1.0", "ether"),
+          },
+        ]);
+      },
+    });
 
-    await screen.findByRole("button", { name: /blending.../i });
+    userEvent.click(within(dialog).getByRole("button", { name: /blend/i }));
+
+    await within(dialog).findByRole("button", { name: /blending/i });
 
     await waitForElementToBeRemoved(() =>
       screen.queryByRole("dialog", { name: /self blend/i })
