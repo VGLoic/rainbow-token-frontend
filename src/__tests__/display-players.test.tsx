@@ -69,9 +69,17 @@ describe("Display player list", () => {
         { callValues: ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"] },
         { persistent: true }
       )
-      .mockCall(
-        "getPlayer",
+      .mockCall("getPlayers", [
         [
+          {
+            color: {
+              r: 123,
+              g: 23,
+              b: 124,
+            },
+            originalColor: { r: 0, g: 255, b: 255 },
+            blendingPrice: ethers.utils.parseUnits("1", "ether"),
+          },
           {
             color: {
               r: 12,
@@ -82,9 +90,7 @@ describe("Display player list", () => {
             blendingPrice: ethers.utils.parseUnits("1.1", "ether"),
           },
         ],
-        { callValues: ["0x3E61338c1a69B0d2642314C9fc6936F0B117D284"] },
-        { persistent: true }
-      )
+      ])
       .mockGetLogs("PlayerJoined", [
         [
           "0xA6d6126Ad67F6A64112FD875523AC20794e805af",

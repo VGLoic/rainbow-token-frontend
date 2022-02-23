@@ -28,9 +28,7 @@ async function fetchPlayerList(rainbowToken: RainbowToken) {
 }
 
 async function fetchPlayers(playerList: string[], rainbowToken: RainbowToken) {
-  const players = await Promise.all(
-    playerList.map((account) => rainbowToken.getPlayer(account))
-  );
+  const players = await rainbowToken.getPlayers(playerList);
   return players.map((p, index) => formatPlayer(playerList[index], p));
 }
 
