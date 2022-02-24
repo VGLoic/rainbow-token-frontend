@@ -1,5 +1,11 @@
-import * as React from "react";
-import { Box, Button, Paper, SxProps, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Paper,
+  SxProps,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { useConnectedMetaMask } from "metamask-react";
 import { BigNumberish, ethers } from "ethers";
 import { useMutation, useQueryClient } from "react-query";
@@ -8,6 +14,8 @@ import Balance from "components/balance";
 import { useIsPlayer, usePlayer, useRainbowToken } from "hooks";
 import SelfBlend from "./self-blend";
 import EditBlendingPrice from "./edit-blending-price";
+import ColorToken from "components/color-token";
+import EthIcon from "components/eth-icon";
 
 function JoinGame() {
   const rainbowToken = useRainbowToken();
@@ -43,30 +51,82 @@ type RainbowTokenAccountProps = {
 function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
   const playerQuery = usePlayer(account);
 
+  const theme = useTheme();
+
   if (playerQuery.status !== "success") return null;
 
   const player = playerQuery.data;
 
   return (
     <Box>
-      <Typography>
-        Blending price:{" "}
-        {ethers.utils.formatUnits(
-          player.blendingPrice as BigNumberish,
-          "ether"
-        )}{" "}
-        ETH <EditBlendingPrice player={player} />
-      </Typography>
-      <Typography>
-        Color: RGB({player.color.r}, {player.color.g}, {player.color.b})
-      </Typography>
-      <Typography>
-        Original color: RGB({player.originalColor.r}, {player.originalColor.g},{" "}
-        {player.originalColor.b}) <SelfBlend player={player} />
-      </Typography>
-      <Typography>
-        Account balance: <Balance account={account} />
-      </Typography>
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{
+          [theme.breakpoints.down("md")]: {
+            flexDirection: "column",
+            alignItems: "flex-start",
+          },
+        }}
+        mb="8px"
+      >
+        <Typography>Blending price:</Typography>
+        <Box display="flex" alignItems="center" ml="4px">
+          <Typography aria-label="account blending price">
+            {ethers.utils.formatUnits(
+              player.blendingPrice as BigNumberish,
+              "ether"
+            )}
+          </Typography>
+          <EthIcon />{" "}
+          <EditBlendingPrice
+            player={player}
+            buttonStyle={{ marginLeft: "8px" }}
+          />
+        </Box>
+      </Box>
+      <Box display="flex" alignItems="center" mb="8px">
+        <Typography>Current color</Typography>
+        <ColorToken
+          style={{ marginLeft: "8px" }}
+          color={player.color}
+          ariaLabelPrefix="current color"
+        />
+      </Box>
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{
+          [theme.breakpoints.down("md")]: {
+            flexDirection: "column",
+            alignItems: "flex-start",
+          },
+        }}
+        mb="8px"
+      >
+        <Typography>Original color</Typography>
+        <Box display="flex" alignItems="center">
+          <ColorToken
+            style={{ marginLeft: "8px", marginRight: "8px" }}
+            color={player.originalColor}
+            ariaLabelPrefix="original color"
+          />{" "}
+          <SelfBlend player={player} />
+        </Box>
+      </Box>
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{
+          [theme.breakpoints.down("md")]: {
+            flexDirection: "column",
+            alignItems: "flex-start",
+          },
+        }}
+      >
+        <Typography mr="8px">Account balance:</Typography>
+        <Balance account={account} ariaLabel="account balance" />
+      </Box>
     </Box>
   );
 }

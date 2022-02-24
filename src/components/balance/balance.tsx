@@ -2,6 +2,8 @@ import * as React from "react";
 import { ethers } from "ethers";
 import { useConnectedMetaMask } from "metamask-react";
 import { useQuery } from "react-query";
+import { Box } from "@mui/material";
+import EthIcon from "components/eth-icon";
 
 function useProvider() {
   const { ethereum, chainId } = useConnectedMetaMask();
@@ -14,8 +16,9 @@ function useProvider() {
 
 type BalanceProps = {
   account: string;
+  ariaLabel?: string;
 };
-function Balance({ account }: BalanceProps) {
+function Balance({ account, ariaLabel }: BalanceProps) {
   const provider = useProvider();
   const balanceQuery = useQuery(
     ["balance", { account }],
@@ -27,10 +30,19 @@ function Balance({ account }: BalanceProps) {
   if (balanceQuery.status !== "success") return null;
 
   return (
-    <span>
-      {Number(ethers.utils.formatUnits(balanceQuery.data, "ether")).toFixed(2)}{" "}
-      ETH{" "}
-    </span>
+    <Box
+      component="span"
+      display="flex"
+      alignItems="center"
+      aria-label={ariaLabel}
+    >
+      <span>
+        {Number(ethers.utils.formatUnits(balanceQuery.data, "ether")).toFixed(
+          2
+        )}
+      </span>
+      <EthIcon />
+    </Box>
   );
 }
 

@@ -30,7 +30,6 @@ function Game() {
       <Box
         sx={{
           height: "100%",
-          flex: 1,
           display: "flex",
           flexDirection: "column",
           marginLeft: "48px",

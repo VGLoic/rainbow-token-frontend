@@ -54,10 +54,10 @@ describe("Game specifics display", () => {
 
     await connectedRender(<App />);
 
-    await screen.findByText(/target color: rgb\(125, 12, 87\)/i);
+    await screen.findByLabelText(/target color rgb\(125, 12, 87\)/i);
     await waitFor(() =>
-      expect(screen.getByText(/contract balance:/i)).toHaveTextContent(
-        /contract balance: 10.00 ETH/i
+      expect(screen.getByLabelText(/contract balance/i)).toHaveTextContent(
+        "10.00"
       )
     );
 
@@ -69,8 +69,8 @@ describe("Game specifics display", () => {
 
     await waitFor(
       () =>
-        expect(screen.getByText(/contract balance:/i)).toHaveTextContent(
-          /contract balance: 11.00 ETH/i
+        expect(screen.getByLabelText(/contract balance/i)).toHaveTextContent(
+          "11.00"
         ),
       { timeout: 1500 }
     );

@@ -60,12 +60,16 @@ describe("Self blend", () => {
 
     await connectedRender(<App />);
 
-    await screen.findByText(/blending price: 1.0 ETH/i);
-    await screen.findByText(/color: rgb\(123, 23, 124\)/i);
-    await screen.findByText(/original color: rgb\(0, 255, 255\)/i);
     await waitFor(() =>
-      expect(screen.getByText(/account balance/i)).toHaveTextContent(
-        "Account balance: 1.00 ETH"
+      expect(
+        screen.getByLabelText(/account blending price/i)
+      ).toHaveTextContent("1.0")
+    );
+    await screen.findByLabelText(/current color rgb\(123, 23, 124\)/i);
+    await screen.findByLabelText(/original color rgb\(0, 255, 255\)/i);
+    await waitFor(() =>
+      expect(screen.getByLabelText(/account balance/i)).toHaveTextContent(
+        "1.00"
       )
     );
 
@@ -77,13 +81,13 @@ describe("Self blend", () => {
     });
 
     expect(
-      screen.getByText(/my color: rgb\(123, 23, 124\)/i)
+      within(dialog).getByLabelText(/account color rgb\(123, 23, 124\)/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/my original color: rgb\(0, 255, 255\)/i)
+      within(dialog).getByLabelText(/original color rgb\(0, 255, 255\)/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/my new color: rgb\(61, 139, 189\)/i)
+      within(dialog).getByLabelText(/new color rgb\(61, 139, 189\)/i)
     ).toBeInTheDocument();
 
     rainbowTokenTestingUtils.mockTransaction("selfBlend", undefined, {
@@ -113,6 +117,8 @@ describe("Self blend", () => {
     expect(
       screen.getByRole("button", { name: /self blend/i })
     ).toBeInTheDocument();
-    expect(screen.getByText(/color: rgb\(61, 139, 189\)/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/current color rgb\(61, 139, 189\)/i)
+    ).toBeInTheDocument();
   });
 });

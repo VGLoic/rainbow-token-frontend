@@ -6,17 +6,22 @@ import {
   DialogContent,
   Typography,
   DialogActions,
+  SxProps,
+  Box,
 } from "@mui/material";
 import { Color, Player } from "common";
 import { useConnectedMetaMask } from "metamask-react";
 import { usePlayer, useRainbowToken } from "hooks";
 import { mergeColors } from "utils";
 import { useMutation, useQueryClient } from "react-query";
+import BlendButton from "components/blend-button";
+import ColorToken from "components/color-token";
 
 type BlendProps = {
   player: Player;
+  buttonStyle?: SxProps;
 };
-function Blend({ player }: BlendProps) {
+function Blend({ player, buttonStyle }: BlendProps) {
   const [open, setOpen] = React.useState(false);
   const { account } = useConnectedMetaMask();
   const playerQuery = usePlayer(account);
@@ -45,9 +50,11 @@ function Blend({ player }: BlendProps) {
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>
-        {blendMutation.status === "loading" ? "Blending..." : "Blend"}
-      </Button>
+      <BlendButton
+        onClick={() => setOpen(true)}
+        isLoading={blendMutation.status === "loading"}
+        style={buttonStyle}
+      />
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -60,18 +67,24 @@ function Blend({ player }: BlendProps) {
         {playerQuery.status === "success" ? (
           <>
             <DialogContent>
-              <Typography>
-                My color: RGB({playerQuery.data.color.r},{" "}
-                {playerQuery.data.color.g}, {playerQuery.data.color.b})
-              </Typography>
-              <Typography>
-                Blending player color: RGB({player.color.r}, {player.color.g},{" "}
-                {player.color.b})
-              </Typography>
-              <Typography>
-                My new color: RGB({mergedColor.r}, {mergedColor.g},{" "}
-                {mergedColor.b})
-              </Typography>
+              <Box display="flex" alignItems="center" mb="8px">
+                <Typography mr="8px">My color</Typography>
+                <ColorToken
+                  color={playerQuery.data.color}
+                  ariaLabelPrefix="account color"
+                />
+              </Box>
+              <Box display="flex" alignItems="center" mb="8px">
+                <Typography mr="8px">Blending player color</Typography>
+                <ColorToken
+                  color={player.color}
+                  ariaLabelPrefix="blending player color"
+                />
+              </Box>
+              <Box display="flex" alignItems="center" mb="8px">
+                <Typography mr="8px">My new color</Typography>
+                <ColorToken color={mergedColor} ariaLabelPrefix="new color" />
+              </Box>
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setOpen(false)}>Cancel</Button>

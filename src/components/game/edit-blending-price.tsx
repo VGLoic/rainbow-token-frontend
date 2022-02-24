@@ -4,14 +4,18 @@ import { useConnectedMetaMask } from "metamask-react";
 import { useMutation, useQueryClient } from "react-query";
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  SxProps,
   TextField,
 } from "@mui/material";
 import { Player } from "common";
 import { ethers } from "ethers";
+import { Edit } from "@mui/icons-material";
 
 function useEditBlendingPrice() {
   const { account } = useConnectedMetaMask();
@@ -35,8 +39,9 @@ function useEditBlendingPrice() {
 
 type EditBlendingPriceProps = {
   player: Player;
+  buttonStyle?: SxProps;
 };
-function EditBlendingPrice({ player }: EditBlendingPriceProps) {
+function EditBlendingPrice({ player, buttonStyle }: EditBlendingPriceProps) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(() =>
     ethers.utils.formatUnits(player.blendingPrice, "ether")
@@ -45,9 +50,19 @@ function EditBlendingPrice({ player }: EditBlendingPriceProps) {
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>
-        {updateBlendingPriceMutation.status === "loading" ? "Updating" : "Edit"}
-      </Button>
+      <IconButton
+        aria-label="edit blending price"
+        color="primary"
+        size="small"
+        onClick={() => setOpen(true)}
+        sx={buttonStyle}
+      >
+        {updateBlendingPriceMutation.status === "loading" ? (
+          <CircularProgress size="24px" />
+        ) : (
+          <Edit />
+        )}
+      </IconButton>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}

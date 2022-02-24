@@ -6,6 +6,7 @@ import {
   DialogContent,
   Typography,
   DialogActions,
+  Box,
 } from "@mui/material";
 import { Player } from "common";
 import { useConnectedMetaMask } from "metamask-react";
@@ -13,6 +14,8 @@ import { useRainbowToken } from "hooks";
 import { mergeColors } from "utils";
 import { useMutation, useQueryClient } from "react-query";
 import { SELF_BLEND_PRICE } from "constants/rainbow-token";
+import BlendButton from "components/blend-button";
+import ColorToken from "components/color-token";
 
 function useSelfBlend() {
   const { account } = useConnectedMetaMask();
@@ -47,9 +50,11 @@ function SelfBlend({ player }: SelfBlendProps) {
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>
-        {selfBlendMutation.status === "loading" ? "Blending..." : "Self Blend"}
-      </Button>
+      <BlendButton
+        onClick={() => setOpen(true)}
+        isLoading={selfBlendMutation.status === "loading"}
+        selfBlend
+      />
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -60,16 +65,21 @@ function SelfBlend({ player }: SelfBlendProps) {
           Self blend
         </DialogTitle>
         <DialogContent>
-          <Typography>
-            My color: RGB({player.color.r}, {player.color.g}, {player.color.b})
-          </Typography>
-          <Typography>
-            My original color: RGB({player.originalColor.r},{" "}
-            {player.originalColor.g}, {player.originalColor.b})
-          </Typography>
-          <Typography>
-            My new color: RGB({mergedColor.r}, {mergedColor.g}, {mergedColor.b})
-          </Typography>
+          <Box display="flex" alignItems="center" mb="8px">
+            <Typography mr="8px">My color</Typography>
+            <ColorToken color={player.color} ariaLabelPrefix="account color" />
+          </Box>
+          <Box display="flex" alignItems="center" mb="8px">
+            <Typography mr="8px">My original color</Typography>
+            <ColorToken
+              color={player.originalColor}
+              ariaLabelPrefix="original color"
+            />
+          </Box>
+          <Box display="flex" alignItems="center" mb="8px">
+            <Typography mr="8px">My new color</Typography>
+            <ColorToken color={mergedColor} ariaLabelPrefix="new color" />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
