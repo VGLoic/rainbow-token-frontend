@@ -7,11 +7,11 @@ import { isChainIdSupported } from "constants/chainid-map";
 
 function Game() {
   const theme = useTheme();
-  const { status, chainId } = useMetaMask();
+  const metaMask = useMetaMask();
 
-  if (status !== "connected") return null;
+  if (metaMask.status !== "connected") return null;
 
-  if (!isChainIdSupported(Number(chainId))) return null;
+  if (!isChainIdSupported(metaMask.chainId)) return null;
 
   return (
     <Box

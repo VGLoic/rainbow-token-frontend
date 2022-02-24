@@ -8,8 +8,32 @@ import {
   Typography,
 } from "@mui/material";
 import { useConnectedMetaMask, useMetaMask } from "metamask-react";
-import { getChainName } from "constants/chainid-map";
+import { getChainEndpoint, getChainName, isChainIdSupported } from "constants/chainid-map";
 import Address from "components/address";
+import { ethers } from "ethers";
+
+const DEFAULT_CHAIN_ID = "0x5"
+
+function useChainId() {
+  const metaMask = useMetaMask();
+  const isWalletChainIdSupported = metaMask.status === "connected" && isChainIdSupported(metaMask.chainId);
+  const chainId = isWalletChainIdSupported
+    ? metaMask.chainId
+    : DEFAULT_CHAIN_ID;
+  return {
+    walletChainId: metaMask.chainId,
+    isWalletChainIdSupported,
+    chainId
+  }
+}
+
+function useReadonlyProvider() {
+  const { chainId } = useChainId();
+  return React.useMemo(() => {
+    const provider = new ethers.providers.JsonRpcProvider(getChainEndpoint(chainId));
+    
+  }, [chainId])
+}
 
 function ConnectWallet() {
   const [open, setOpen] = React.useState(false);
