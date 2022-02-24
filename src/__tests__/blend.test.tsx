@@ -2,6 +2,7 @@ import {
   screen,
   within,
   waitForElementToBeRemoved,
+  waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "App";
@@ -106,8 +107,16 @@ describe("Blend with other player", () => {
     const table = await screen.findByRole("table", { name: /players table/i });
 
     await within(table).findByText(/0xA6d...5af/i);
-    await within(table).findByText(/rgb\(123, 23, 124\)/i);
-    await within(table).findByText(/1.0 ETH/i);
+    await within(table).findByLabelText(
+      /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(123, 23, 124\)/i
+    );
+    await waitFor(() => {
+      expect(
+        within(table).getByLabelText(
+          /0xA6d6126Ad67F6A64112FD875523AC20794e805af blending price/i
+        )
+      ).toHaveTextContent("1.0");
+    });
 
     userEvent.click(within(table).getByRole("button", { name: /blend/i }));
 
@@ -117,13 +126,13 @@ describe("Blend with other player", () => {
     });
 
     expect(
-      screen.getByText(/my color: rgb\(123, 23, 124\)/i)
+      within(dialog).getByLabelText(/account color rgb\(123, 23, 124\)/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/blending player color: rgb\(12, 232, 12\)/i)
+      within(dialog).getByLabelText(/blending player color rgb\(12, 232, 12\)/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/my new color: rgb\(67, 127, 68\)/i)
+      within(dialog).getByLabelText(/new color rgb\(67, 127, 68\)/i)
     ).toBeInTheDocument();
 
     rainbowTokenTestingUtils.mockTransaction("blend", undefined, {
@@ -175,9 +184,13 @@ describe("Blend with other player", () => {
       within(table).getByRole("button", { name: /blend/i })
     ).toBeInTheDocument();
 
-    await screen.findByText(/color: rgb\(67, 127, 68\)/i);
-    await within(table).findByText(/rgb\(67, 127, 68\)/i, undefined, {
-      timeout: 4500,
-    });
+    await screen.findByLabelText(/current color rgb\(67, 127, 68\)/i);
+    await within(table).findByLabelText(
+      /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(67, 127, 68\)/i,
+      undefined,
+      {
+        timeout: 4500,
+      }
+    );
   }, 10000);
 });

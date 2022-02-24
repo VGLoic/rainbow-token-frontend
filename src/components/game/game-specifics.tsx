@@ -5,6 +5,7 @@ import { useConnectedMetaMask } from "metamask-react";
 import { contracts, RainbowToken__factory } from "rainbow-token-contracts";
 import { useQuery } from "react-query";
 import Balance from "components/balance";
+import ColorToken from "components/color-token";
 
 function useRainbowToken() {
   const { ethereum, chainId } = useConnectedMetaMask();
@@ -35,13 +36,21 @@ function GameSpecifics({ style }: GameSpecificsProps) {
       </Typography>
       {targetColorQuery.status === "success" ? (
         <Box>
-          <Typography>
-            Target color: RGB({targetColorQuery.data.r},{" "}
-            {targetColorQuery.data.g}, {targetColorQuery.data.b})
-          </Typography>
-          <Typography>
-            Contract balance: <Balance account={rainbowToken.address} />
-          </Typography>
+          <Box display="flex" alignItems="center" mb="8px">
+            Target color:{" "}
+            <ColorToken
+              style={{ marginLeft: "4px" }}
+              color={targetColorQuery.data}
+              ariaLabelPrefix="target color"
+            />
+          </Box>
+          <Box display="flex" alignItems="center">
+            <Typography mr="8px">Contract balance:</Typography>
+            <Balance
+              account={rainbowToken.address}
+              ariaLabel="contract balance"
+            />
+          </Box>
         </Box>
       ) : null}
     </Paper>

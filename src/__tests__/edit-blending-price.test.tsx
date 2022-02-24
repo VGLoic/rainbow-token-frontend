@@ -74,16 +74,22 @@ describe("Edit blending price", () => {
 
     await connectedRender(<App />);
 
-    await screen.findByText(/blending price: 1.0 ETH/i);
-    await screen.findByText(/color: rgb\(123, 23, 124\)/i);
-    await screen.findByText(/original color: rgb\(0, 255, 255\)/i);
     await waitFor(() =>
-      expect(screen.getByText(/account balance/i)).toHaveTextContent(
-        "Account balance: 1.00 ETH"
+      expect(
+        screen.getByLabelText(/account blending price/i)
+      ).toHaveTextContent("1.0")
+    );
+    await screen.findByLabelText(/current color rgb\(123, 23, 124\)/i);
+    await screen.findByLabelText(/original color rgb\(0, 255, 255\)/i);
+    await waitFor(() =>
+      expect(screen.getByLabelText(/account balance/i)).toHaveTextContent(
+        "1.00"
       )
     );
 
-    userEvent.click(screen.getByRole("button", { name: /edit/i }));
+    userEvent.click(
+      screen.getByRole("button", { name: /edit blending price/i })
+    );
 
     expect(
       screen.getByRole("dialog", {
@@ -108,6 +114,10 @@ describe("Edit blending price", () => {
     );
 
     expect(screen.getByRole("button", { name: /edit/i })).toBeInTheDocument();
-    expect(screen.getByText(/blending price: 1.1 ETH/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByLabelText(/account blending price/i)
+      ).toHaveTextContent("1.1")
+    );
   });
 });

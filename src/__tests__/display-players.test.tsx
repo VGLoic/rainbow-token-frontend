@@ -1,4 +1,4 @@
-import { screen, act } from "@testing-library/react";
+import { screen, act, waitFor } from "@testing-library/react";
 import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
@@ -94,12 +94,28 @@ describe("Display player list", () => {
     ).toBeInTheDocument();
 
     await screen.findByText(/0xA6d...5af/i);
-    await screen.findByText(/rgb\(123, 23, 124\)/i);
-    await screen.findByText(/1.0 ETH/i);
+    await screen.findByLabelText(
+      /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(123, 23, 124\)/i
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(
+          /0xA6d6126Ad67F6A64112FD875523AC20794e805af blending price/i
+        )
+      ).toHaveTextContent("1.0");
+    });
 
     await screen.findByText(/0x3E6...284/i);
-    await screen.findByText(/rgb\(12, 232, 12\)/i);
-    await screen.findByText(/1.1 ETH/i);
+    await screen.findByLabelText(
+      /0x3E61338c1a69B0d2642314C9fc6936F0B117D284 color rgb\(12, 232, 12\)/i
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(
+          /0x3E61338c1a69B0d2642314C9fc6936F0B117D284 blending price/i
+        )
+      ).toHaveTextContent("1.1");
+    });
 
     act(() => {
       rainbowTokenTestingUtils.mockEmitLog("PlayerJoined", [
@@ -111,10 +127,16 @@ describe("Display player list", () => {
     await screen.findByText(/0x39E...c7A/i, undefined, {
       timeout: 4500,
     });
-    await screen.findByText(/rgb\(0, 0, 0\)/i, undefined, {
+    await screen.findByLabelText(/rgb\(0, 0, 0\)/i, undefined, {
       timeout: 4500,
     });
-    await screen.findByText(/0.1 ETH/i, undefined, { timeout: 4500 });
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText(
+          /0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A blending price/i
+        )
+      ).toHaveTextContent("0.1");
+    });
 
     act(() => {
       rainbowTokenTestingUtils.mockEmitLog("BlendingPriceUpdated", [
@@ -122,7 +144,16 @@ describe("Display player list", () => {
         ethers.utils.parseUnits("2.1", "ether").toHexString(),
       ]);
     });
-    await screen.findByText(/2.1 ETH/i, undefined, { timeout: 4500 });
+    await waitFor(
+      () => {
+        expect(
+          screen.getByLabelText(
+            /0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A blending price/i
+          )
+        ).toHaveTextContent("2.1");
+      },
+      { timeout: 4500 }
+    );
 
     act(() => {
       rainbowTokenTestingUtils.mockEmitLog("Blended", [
@@ -132,9 +163,13 @@ describe("Display player list", () => {
         { r: 0, g: 255, b: 255 },
       ]);
     });
-    await screen.findByText(/rgb\(0, 127, 127\)/i, undefined, {
-      timeout: 4500,
-    });
+    await screen.findByLabelText(
+      /0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A color rgb\(0, 127, 127\)/i,
+      undefined,
+      {
+        timeout: 4500,
+      }
+    );
 
     act(() => {
       rainbowTokenTestingUtils.mockEmitLog("SelfBlended", [
@@ -142,8 +177,12 @@ describe("Display player list", () => {
         { r: 0, g: 63, b: 63 },
       ]);
     });
-    await screen.findByText(/rgb\(0, 63, 63\)/i, undefined, {
-      timeout: 4500,
-    });
+    await screen.findByLabelText(
+      /0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A color rgb\(0, 63, 63\)/i,
+      undefined,
+      {
+        timeout: 4500,
+      }
+    );
   }, 30000);
 });

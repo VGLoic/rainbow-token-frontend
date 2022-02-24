@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Box,
   Paper,
   Table,
   TableBody,
@@ -7,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
   useTheme,
 } from "@mui/material";
 import { BigNumber, ethers } from "ethers";
@@ -19,6 +21,8 @@ import { useIsPlayer, useReadonlyRainbowToken } from "hooks";
 import Blend from "./blend";
 import { Color, Player } from "common";
 import { DEFAULT_BLENDING_PRICE } from "constants/rainbow-token";
+import ColorToken from "components/color-token";
+import EthIcon from "components/eth-icon";
 
 async function fetchPlayerList(rainbowToken: RainbowToken) {
   const events = await rainbowToken.queryFilter(
@@ -166,8 +170,14 @@ function Players() {
         <TableHead>
           <TableRow>
             <TableCell>Address</TableCell>
-            <TableCell align="center">Color</TableCell>
-            <TableCell align="center">Blending price</TableCell>
+            <TableCell align="right">Color</TableCell>
+            <TableCell align="right">
+              <Box display="flex" alignItems="center">
+                <Box flex={1}>Blending price (</Box>
+                <EthIcon />
+                <div>)</div>
+              </Box>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -182,15 +192,27 @@ function Players() {
                   <TableCell component="th" scope="row">
                     <Address address={player.account} />
                   </TableCell>
-                  <TableCell align="center">
-                    RGB({player.color.r}, {player.color.g}, {player.color.b}){" "}
-                    {isPlayer && !areAddressesEqual(player.account, account) ? (
-                      <Blend player={player} />
-                    ) : null}
+                  <TableCell align="right">
+                    <Box display="flex" alignItems="center">
+                      <Box flex={1}>
+                        {isPlayer &&
+                        !areAddressesEqual(player.account, account) ? (
+                          <Blend
+                            player={player}
+                            buttonStyle={{ marginRight: "8px" }}
+                          />
+                        ) : null}
+                      </Box>
+                      <ColorToken
+                        color={player.color}
+                        ariaLabelPrefix={`${player.account} color`}
+                      />
+                    </Box>
                   </TableCell>
-                  <TableCell align="center">
-                    {ethers.utils.formatUnits(player.blendingPrice, "ether")}{" "}
-                    ETH
+                  <TableCell align="right">
+                    <Typography aria-label={`${player.account} blending price`}>
+                      {ethers.utils.formatUnits(player.blendingPrice, "ether")}{" "}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               ))
