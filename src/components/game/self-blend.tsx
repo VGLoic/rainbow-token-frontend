@@ -18,7 +18,7 @@ import BlendButton from "components/blend-button";
 import ColorToken from "components/color-token";
 
 function useSelfBlend() {
-  const { account } = useConnectedMetaMask();
+  const { account, chainId } = useConnectedMetaMask();
   const rainbowToken = useRainbowToken();
   const queryClient = useQueryClient();
 
@@ -31,7 +31,7 @@ function useSelfBlend() {
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["player", { account }]);
+        queryClient.invalidateQueries([{ chainId }, "player", { account }]);
       },
     }
   );

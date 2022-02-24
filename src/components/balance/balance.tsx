@@ -20,8 +20,9 @@ type BalanceProps = {
 };
 function Balance({ account, ariaLabel }: BalanceProps) {
   const provider = useProvider();
+  const { chainId } = useConnectedMetaMask();
   const balanceQuery = useQuery(
-    ["balance", { account }],
+    [{ chainId }, "balance", { account }],
     () => provider.getBalance(account),
     {
       refetchInterval: 1000,

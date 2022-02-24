@@ -24,8 +24,9 @@ type GameSpecificsProps = {
 };
 function GameSpecifics({ style }: GameSpecificsProps) {
   const rainbowToken = useRainbowToken();
+  const { chainId } = useConnectedMetaMask();
 
-  const targetColorQuery = useQuery("targetColor", () =>
+  const targetColorQuery = useQuery([{ chainId }, "targetColor"], () =>
     rainbowToken.getTargetColor()
   );
 

@@ -38,12 +38,14 @@ async function fetchPlayers(playerList: string[], rainbowToken: RainbowToken) {
 
 function usePlayers() {
   const rainbowToken = useReadonlyRainbowToken();
-  const playerListQuery = useQuery("playerList", () =>
+  const { chainId } = useConnectedMetaMask();
+
+  const playerListQuery = useQuery([{ chainId }, "playerList"], () =>
     fetchPlayerList(rainbowToken)
   );
 
   const playersQuery = useQuery(
-    "players",
+    [{ chainId }, "players"],
     () => fetchPlayers(playerListQuery.data as string[], rainbowToken),
     {
       enabled: playerListQuery.status === "success",
@@ -66,13 +68,13 @@ function usePlayers() {
         if (!currentPlayers) return [newPlayer];
         return [...currentPlayers, newPlayer];
       };
-      queryClient.setQueryData("players", updater);
+      queryClient.setQueryData([{ chainId }, "players"], updater);
     };
     rainbowToken.on(rainbowToken.filters.PlayerJoined(), onPlayerJoined);
     return () => {
       rainbowToken.off(rainbowToken.filters.PlayerJoined(), onPlayerJoined);
     };
-  }, [rainbowToken, queryClient]);
+  }, [rainbowToken, queryClient, chainId]);
 
   React.useEffect(() => {
     const onBlendingPriceUpdated = (
@@ -89,7 +91,7 @@ function usePlayers() {
           return player;
         });
       };
-      queryClient.setQueryData("players", updater);
+      queryClient.setQueryData([{ chainId }, "players"], updater);
     };
     rainbowToken.on(
       rainbowToken.filters.BlendingPriceUpdated(),
@@ -101,7 +103,7 @@ function usePlayers() {
         onBlendingPriceUpdated
       );
     };
-  }, [rainbowToken, queryClient]);
+  }, [rainbowToken, queryClient, chainId]);
 
   React.useEffect(() => {
     const onBlended = (
@@ -119,13 +121,13 @@ function usePlayers() {
           return player;
         });
       };
-      queryClient.setQueryData("players", updater);
+      queryClient.setQueryData([{ chainId }, "players"], updater);
     };
     rainbowToken.on(rainbowToken.filters.Blended(), onBlended);
     return () => {
       rainbowToken.off(rainbowToken.filters.Blended(), onBlended);
     };
-  }, [rainbowToken, queryClient]);
+  }, [rainbowToken, queryClient, chainId]);
 
   React.useEffect(() => {
     const onSelfBlended = (account: string, color: Color, _: unknown) => {
@@ -138,13 +140,13 @@ function usePlayers() {
           return player;
         });
       };
-      queryClient.setQueryData("players", updater);
+      queryClient.setQueryData([{ chainId }, "players"], updater);
     };
     rainbowToken.on(rainbowToken.filters.SelfBlended(), onSelfBlended);
     return () => {
       rainbowToken.off(rainbowToken.filters.SelfBlended(), onSelfBlended);
     };
-  }, [rainbowToken, queryClient]);
+  }, [rainbowToken, queryClient, chainId]);
 
   return playersQuery;
 }

@@ -18,7 +18,7 @@ import { ethers } from "ethers";
 import { Edit } from "@mui/icons-material";
 
 function useEditBlendingPrice() {
-  const { account } = useConnectedMetaMask();
+  const { account, chainId } = useConnectedMetaMask();
   const rainbowToken = useRainbowToken();
   const queryClient = useQueryClient();
 
@@ -29,7 +29,7 @@ function useEditBlendingPrice() {
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["player", { account }]);
+        queryClient.invalidateQueries([{ chainId }, "player", { account }]);
       },
     }
   );
