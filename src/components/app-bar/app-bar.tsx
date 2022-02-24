@@ -1,7 +1,9 @@
-import { Box } from "@mui/material";
-import Wallet from "./wallet";
+import { Box, Typography } from "@mui/material";
+import { getChainName } from "constants/chainid-map";
+import { useChainId } from "hooks/readonly-provider";
 
 function AppBar() {
+  const { chainId, chainIdStatus } = useChainId();
   return (
     <Box
       sx={{
@@ -9,10 +11,15 @@ function AppBar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-end",
-        padding: "0 8px",
+        padding: "8px 24px",
       }}
     >
-      <Wallet />
+      <Typography
+        color={chainIdStatus === "notSupported" ? "error" : "inherit"}
+        fontWeight="bold"
+      >
+        {getChainName(chainId)}
+      </Typography>
     </Box>
   );
 }

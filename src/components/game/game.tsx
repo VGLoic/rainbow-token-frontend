@@ -1,17 +1,16 @@
-import { Box, useTheme } from "@mui/material";
-import { useMetaMask } from "metamask-react";
+import { Box, Typography, useTheme } from "@mui/material";
 import AccountSpecifics from "./account-specifics";
 import GameSpecifics from "./game-specifics";
 import Players from "./players";
-import { isChainIdSupported } from "constants/chainid-map";
+import { useChainId } from "hooks/readonly-provider";
 
 function Game() {
   const theme = useTheme();
-  const metaMask = useMetaMask();
+  const { chainIdStatus } = useChainId();
 
-  if (metaMask.status !== "connected") return null;
-
-  if (!isChainIdSupported(metaMask.chainId)) return null;
+  if (chainIdStatus === "notSupported") {
+    return <Typography>Network not supported :(</Typography>;
+  }
 
   return (
     <Box
@@ -26,9 +25,17 @@ function Game() {
         },
       }}
     >
-      <Players />
+      <Players
+        style={{
+          flex: 5,
+          [theme.breakpoints.down("md")]: {
+            width: "100%",
+          },
+        }}
+      />
       <Box
         sx={{
+          flex: 2,
           height: "100%",
           display: "flex",
           flexDirection: "column",

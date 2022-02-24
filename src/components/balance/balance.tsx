@@ -1,26 +1,17 @@
-import * as React from "react";
 import { ethers } from "ethers";
-import { useConnectedMetaMask } from "metamask-react";
 import { useQuery } from "react-query";
 import { Box } from "@mui/material";
 import EthIcon from "components/eth-icon";
-
-function useProvider() {
-  const { ethereum, chainId } = useConnectedMetaMask();
-  return React.useMemo(() => {
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    return provider;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereum, chainId]);
-}
+import { useChainId, useReadonlyProvider } from "hooks";
 
 type BalanceProps = {
   account: string;
   ariaLabel?: string;
 };
 function Balance({ account, ariaLabel }: BalanceProps) {
-  const provider = useProvider();
-  const { chainId } = useConnectedMetaMask();
+  const provider = useReadonlyProvider();
+  const { chainId } = useChainId();
+
   const balanceQuery = useQuery(
     [{ chainId }, "balance", { account }],
     () => provider.getBalance(account),

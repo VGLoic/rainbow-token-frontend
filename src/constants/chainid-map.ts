@@ -13,8 +13,8 @@ export const chainIdToNameMap: Record<string, string> = {
 
 const chainIdToEndpointMap: Record<string, string> = {
   5: `https://goerli.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`,
-  31337: "http://localhost:8545"
-}
+  31337: "http://localhost:8545",
+};
 
 export const DEFAULT_CHAIN_ID = "0x5";
 
