@@ -23,7 +23,7 @@ type BlendProps = {
 };
 function Blend({ player, buttonStyle }: BlendProps) {
   const [open, setOpen] = React.useState(false);
-  const { account } = useConnectedMetaMask();
+  const { account, chainId } = useConnectedMetaMask();
   const playerQuery = usePlayer(account);
   const rainbowToken = useRainbowToken();
   const queryClient = useQueryClient();
@@ -37,7 +37,7 @@ function Blend({ player, buttonStyle }: BlendProps) {
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["player", { account }]);
+        queryClient.invalidateQueries([{ chainId }, "player", { account }]);
         setOpen(false);
       },
     }

@@ -20,6 +20,7 @@ import EthIcon from "components/eth-icon";
 function JoinGame() {
   const rainbowToken = useRainbowToken();
   const queryClient = useQueryClient();
+  const { chainId } = useConnectedMetaMask();
 
   const { status, mutate } = useMutation(
     () =>
@@ -29,7 +30,7 @@ function JoinGame() {
         .then((tx) => tx.wait()),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(["isPlayer"]);
+        queryClient.invalidateQueries([{ chainId }, "isPlayer"]);
       },
     }
   );
