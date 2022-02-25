@@ -3,39 +3,36 @@ import App from "App";
 import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
-import { connectedRender } from "testing-utils";
+import { wrappedRender } from "testing-utils";
+import * as chainIdUtils from "constants/chainid-map";
 
 describe("Game specifics display", () => {
-  const { provider, testingUtils } = setupEthTesting({
-    providerType: "MetaMask",
-  });
-
   const contractAddress =
     contracts.rainbowToken.getNetworkConfiguration(5).address;
 
-  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
+  const readTestingUtils = setupEthTesting();
+
+  const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
 
-  let originalEth: unknown;
-  beforeAll(() => {
-    originalEth = global.window.ethereum;
-    window.ethereum = provider;
-  });
-
-  afterAll(() => {
-    window.ethereum = originalEth;
+  beforeEach(() => {
+    jest
+      .spyOn(chainIdUtils, "getChainProvider")
+      .mockImplementation((_: string) => {
+        return new ethers.providers.Web3Provider(
+          readTestingUtils.getProvider() as any
+        );
+      });
   });
 
   afterEach(() => {
-    testingUtils.clearAllMocks();
+    readTestingUtils.clearAllMocks();
   });
 
-  test("a connected user should be able to see the game informations", async () => {
-    testingUtils
-      .mockConnectedWallet(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
-        chainId: "0x5",
-      })
+  test("a user should be able to see the game informations", async () => {
+    readTestingUtils
+      .mockReadonlyProvider({ chainId: "0x5" })
       .mockBalance(
         "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
         ethers.utils.parseUnits("1").toString()
@@ -52,7 +49,7 @@ describe("Game specifics display", () => {
         },
       ]);
 
-    await connectedRender(<App />);
+    wrappedRender(<App />);
 
     await screen.findByLabelText(/target color rgb\(125, 12, 87\)/i);
     await waitFor(() =>
@@ -62,7 +59,7 @@ describe("Game specifics display", () => {
     );
 
     // Balance is updated to 11 eth
-    testingUtils.mockBalance(
+    readTestingUtils.mockBalance(
       contractAddress,
       ethers.utils.parseUnits("11").toString()
     );

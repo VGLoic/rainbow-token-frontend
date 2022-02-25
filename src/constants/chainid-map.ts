@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 
 export const chainIdToNameMap: Record<string, string> = {
@@ -24,6 +25,11 @@ export function getChainEndpoint(chainId: string) {
     throw new Error(`Endpoint not found for chain ID: ${chainId}`);
   }
   return chainEndpoint;
+}
+
+export function getChainProvider(chainId: string) {
+  const chainEndpoint = getChainEndpoint(chainId);
+  return new ethers.providers.JsonRpcProvider(chainEndpoint);
 }
 
 export function getChainName(chainId: string) {

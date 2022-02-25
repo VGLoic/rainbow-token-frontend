@@ -1,11 +1,10 @@
+import * as React from "react";
 import {
-  getChainEndpoint,
   isChainIdSupported,
   DEFAULT_CHAIN_ID,
+  getChainProvider,
 } from "constants/chainid-map";
-import { ethers } from "ethers";
 import { useMetaMask } from "metamask-react";
-import * as React from "react";
 
 export function useChainId() {
   const metaMask = useMetaMask();
@@ -28,9 +27,7 @@ export function useChainId() {
 export function useReadonlyProvider() {
   const { chainId } = useChainId();
   return React.useMemo(() => {
-    const provider = new ethers.providers.JsonRpcProvider(
-      getChainEndpoint(chainId)
-    );
+    const provider = getChainProvider(chainId);
     return provider;
   }, [chainId]);
 }

@@ -22,7 +22,7 @@ import Address from "components/address";
 function JoinGame() {
   const rainbowToken = useRainbowToken();
   const queryClient = useQueryClient();
-  const { chainId } = useConnectedMetaMask();
+  const { chainId, account } = useConnectedMetaMask();
 
   const { status, mutate } = useMutation(
     () =>
@@ -40,7 +40,7 @@ function JoinGame() {
   return (
     <>
       <Typography component="h2" variant="h6" mb="8px">
-        Wanna play?
+        <Address address={account} />
       </Typography>
       <Box
         sx={{

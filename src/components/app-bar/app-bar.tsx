@@ -17,6 +17,7 @@ function AppBar() {
       <Typography
         color={chainIdStatus === "notSupported" ? "error" : "inherit"}
         fontWeight="bold"
+        aria-label="network"
       >
         {getChainName(chainId)}
       </Typography>
