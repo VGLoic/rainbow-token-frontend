@@ -10,41 +10,61 @@ import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
 import App from "../App";
+import * as chainIdUtils from "constants/chainid-map";
 
 describe("Self blend", () => {
-  const { provider, testingUtils } = setupEthTesting({
+  const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
+  const readTestingUtils = setupEthTesting();
 
-  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
+  const rainbowTokenReadTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
+
+  const rainbowTokenWriteTestingUtils =
+    metaMaskTestingUtils.generateContractUtils(
+      contracts.rainbowToken.getNetworkConfiguration(5).abi
+    );
 
   let originalEth: unknown;
   beforeAll(() => {
     originalEth = global.window.ethereum;
-    window.ethereum = provider;
+    window.ethereum = metaMaskTestingUtils.getProvider();
   });
 
   afterAll(() => {
     window.ethereum = originalEth;
   });
 
-  afterEach(() => {
-    testingUtils.clearAllMocks();
+  beforeEach(() => {
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+    jest
+      .spyOn(chainIdUtils, "getChainProvider")
+      .mockImplementation((_: string) => {
+        return new ethers.providers.Web3Provider(
+          readTestingUtils.getProvider() as any
+        );
+      });
   });
 
+  afterEach(() => {
+    metaMaskTestingUtils.clearAllMocks();
+    readTestingUtils.clearAllMocks();
+  });
   test("user should be able to update its blending price", async () => {
-    testingUtils
-      .mockConnectedWallet(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
+    metaMaskTestingUtils.mockConnectedWallet(
+      ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
+      {
         chainId: "0x5",
-      })
-      .mockBalance(
-        "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
-        ethers.utils.parseUnits("1").toString()
-      );
+      }
+    );
+    readTestingUtils.mockBalance(
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+      ethers.utils.parseUnits("1").toString()
+    );
 
-    rainbowTokenTestingUtils
+    rainbowTokenReadTestingUtils
       .mockCall("isPlayer", [true])
       .mockCall("getPlayer", [
         {
@@ -90,9 +110,9 @@ describe("Self blend", () => {
       within(dialog).getByLabelText(/new color rgb\(61, 139, 189\)/i)
     ).toBeInTheDocument();
 
-    rainbowTokenTestingUtils.mockTransaction("selfBlend", undefined, {
+    rainbowTokenWriteTestingUtils.mockTransaction("selfBlend", undefined, {
       triggerCallback: () => {
-        rainbowTokenTestingUtils.mockCall("getPlayer", [
+        rainbowTokenReadTestingUtils.mockCall("getPlayer", [
           {
             color: {
               r: 61,

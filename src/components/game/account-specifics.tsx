@@ -6,7 +6,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useConnectedMetaMask } from "metamask-react";
+import { useConnectedMetaMask, useMetaMask } from "metamask-react";
 import { BigNumberish, ethers } from "ethers";
 import { useMutation, useQueryClient } from "react-query";
 import { ENTRY_FEE } from "constants/rainbow-token";
@@ -16,11 +16,13 @@ import SelfBlend from "./self-blend";
 import EditBlendingPrice from "./edit-blending-price";
 import ColorToken from "components/color-token";
 import EthIcon from "components/eth-icon";
+import ConnectWallet from "components/connect-wallet";
+import Address from "components/address";
 
 function JoinGame() {
   const rainbowToken = useRainbowToken();
   const queryClient = useQueryClient();
-  const { chainId } = useConnectedMetaMask();
+  const { chainId, account } = useConnectedMetaMask();
 
   const { status, mutate } = useMutation(
     () =>
@@ -36,13 +38,26 @@ function JoinGame() {
   );
 
   return (
-    <Button
-      variant="contained"
-      onClick={() => mutate()}
-      disabled={status === "loading"}
-    >
-      {status === "loading" ? "Joining..." : "Join the Game"}
-    </Button>
+    <>
+      <Typography component="h2" variant="h6" mb="8px">
+        <Address address={account} />
+      </Typography>
+      <Box
+        sx={{
+          padding: "24px 0",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <Button
+          variant="contained"
+          onClick={() => mutate()}
+          disabled={status === "loading"}
+        >
+          {status === "loading" ? "Joining..." : "Join the Game"}
+        </Button>
+      </Box>
+    </>
   );
 }
 
@@ -59,76 +74,115 @@ function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
   const player = playerQuery.data;
 
   return (
-    <Box>
-      <Box
-        display="flex"
-        alignItems="center"
-        sx={{
-          [theme.breakpoints.down("md")]: {
-            flexDirection: "column",
-            alignItems: "flex-start",
-          },
-        }}
-        mb="8px"
-      >
-        <Typography>Blending price:</Typography>
-        <Box display="flex" alignItems="center" ml="4px">
-          <Typography aria-label="account blending price">
-            {ethers.utils.formatUnits(
-              player.blendingPrice as BigNumberish,
-              "ether"
-            )}
-          </Typography>
-          <EthIcon />{" "}
-          <EditBlendingPrice
-            player={player}
-            buttonStyle={{ marginLeft: "8px" }}
+    <>
+      <Typography component="h2" variant="h6" mb="8px">
+        <Address address={account} />
+      </Typography>
+      <Box>
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{
+            [theme.breakpoints.down("md")]: {
+              flexDirection: "column",
+              alignItems: "flex-start",
+            },
+          }}
+          mb="8px"
+        >
+          <Typography>Blending price:</Typography>
+          <Box display="flex" alignItems="center" ml="4px">
+            <Typography aria-label="account blending price">
+              {ethers.utils.formatUnits(
+                player.blendingPrice as BigNumberish,
+                "ether"
+              )}
+            </Typography>
+            <EthIcon />{" "}
+            <EditBlendingPrice
+              player={player}
+              buttonStyle={{ marginLeft: "8px" }}
+            />
+          </Box>
+        </Box>
+        <Box display="flex" alignItems="center" mb="8px">
+          <Typography>Current color</Typography>
+          <ColorToken
+            style={{ marginLeft: "8px" }}
+            color={player.color}
+            ariaLabelPrefix="current color"
           />
         </Box>
-      </Box>
-      <Box display="flex" alignItems="center" mb="8px">
-        <Typography>Current color</Typography>
-        <ColorToken
-          style={{ marginLeft: "8px" }}
-          color={player.color}
-          ariaLabelPrefix="current color"
-        />
-      </Box>
-      <Box
-        display="flex"
-        alignItems="center"
-        sx={{
-          [theme.breakpoints.down("md")]: {
-            flexDirection: "column",
-            alignItems: "flex-start",
-          },
-        }}
-        mb="8px"
-      >
-        <Typography>Original color</Typography>
-        <Box display="flex" alignItems="center">
-          <ColorToken
-            style={{ marginLeft: "8px", marginRight: "8px" }}
-            color={player.originalColor}
-            ariaLabelPrefix="original color"
-          />{" "}
-          <SelfBlend player={player} />
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{
+            [theme.breakpoints.down("md")]: {
+              flexDirection: "column",
+              alignItems: "flex-start",
+            },
+          }}
+          mb="8px"
+        >
+          <Typography>Original color</Typography>
+          <Box display="flex" alignItems="center">
+            <ColorToken
+              style={{ marginLeft: "8px", marginRight: "8px" }}
+              color={player.originalColor}
+              ariaLabelPrefix="original color"
+            />{" "}
+            <SelfBlend player={player} />
+          </Box>
+        </Box>
+        <Box
+          display="flex"
+          alignItems="center"
+          sx={{
+            [theme.breakpoints.down("md")]: {
+              flexDirection: "column",
+              alignItems: "flex-start",
+            },
+          }}
+        >
+          <Typography mr="8px">Account balance:</Typography>
+          <Balance account={account} ariaLabel="account balance" />
         </Box>
       </Box>
+    </>
+  );
+}
+
+type ConnectedAccountProps = {
+  account: string;
+};
+function ConnectedAccount({ account }: ConnectedAccountProps) {
+  const { status, isPlayer } = useIsPlayer(account);
+
+  if (status !== "success") return null;
+
+  if (!isPlayer) {
+    return <JoinGame />;
+  }
+
+  return <RainbowTokenAccount account={account} />;
+}
+
+function NotConnectedAccount() {
+  return (
+    <>
+      <Typography component="h2" variant="h6" mb="8px">
+        Wanna play?
+      </Typography>
       <Box
-        display="flex"
-        alignItems="center"
         sx={{
-          [theme.breakpoints.down("md")]: {
-            flexDirection: "column",
-            alignItems: "flex-start",
-          },
+          padding: "24px 0",
+          display: "flex",
+          justifyContent: "center",
         }}
       >
-        <Typography mr="8px">Account balance:</Typography>
-        <Balance account={account} ariaLabel="account balance" />
+        <ConnectWallet />
       </Box>
-    </Box>
+    </>
   );
 }
 
@@ -136,18 +190,14 @@ type AccountSpecificsProps = {
   style?: SxProps;
 };
 function AccountSpecifics({ style }: AccountSpecificsProps) {
-  const { account } = useConnectedMetaMask();
-  const { status, isPlayer } = useIsPlayer(account);
+  const metaMask = useMetaMask();
 
   return (
     <Paper sx={{ padding: "16px", ...style }}>
-      <Typography component="h2" variant="h6" mb="8px">
-        Account Specifics
-      </Typography>
-      {status !== "success" ? null : isPlayer ? (
-        <RainbowTokenAccount account={account} />
+      {metaMask.status !== "connected" ? (
+        <NotConnectedAccount />
       ) : (
-        <JoinGame />
+        <ConnectedAccount account={metaMask.account} />
       )}
     </Paper>
   );

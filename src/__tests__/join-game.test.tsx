@@ -9,58 +9,82 @@ import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
 import App from "../App";
+import * as chainIdUtils from "constants/chainid-map";
 
 describe("Join the game", () => {
-  const { provider, testingUtils } = setupEthTesting({
+  const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
+  const readTestingUtils = setupEthTesting();
 
-  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
+  const rainbowTokenReadTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
+
+  const rainbowTokenWriteTestingUtils =
+    metaMaskTestingUtils.generateContractUtils(
+      contracts.rainbowToken.getNetworkConfiguration(5).abi
+    );
 
   let originalEth: unknown;
   beforeAll(() => {
     originalEth = global.window.ethereum;
-    window.ethereum = provider;
+    window.ethereum = metaMaskTestingUtils.getProvider();
   });
 
   afterAll(() => {
     window.ethereum = originalEth;
   });
 
+  beforeEach(() => {
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+    jest
+      .spyOn(chainIdUtils, "getChainProvider")
+      .mockImplementation((_: string) => {
+        return new ethers.providers.Web3Provider(
+          readTestingUtils.getProvider() as any
+        );
+      });
+  });
+
   afterEach(() => {
-    testingUtils.clearAllMocks();
+    metaMaskTestingUtils.clearAllMocks();
+    readTestingUtils.clearAllMocks();
   });
 
   test("user should be able to join the game, then its informations should be displayed", async () => {
-    testingUtils
-      .mockConnectedWallet(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
+    metaMaskTestingUtils.mockConnectedWallet(
+      ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
+      {
         chainId: "0x5",
-      })
-      .mockBalance(
-        "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
-        ethers.utils.parseUnits("1").toString()
-      );
+      }
+    );
+    readTestingUtils.mockBalance(
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+      ethers.utils.parseUnits("1").toString()
+    );
 
-    rainbowTokenTestingUtils
+    rainbowTokenReadTestingUtils
       .mockCall("isPlayer", [false])
-      .mockTransaction("joinGame", undefined, {
-        triggerCallback: () => {
-          rainbowTokenTestingUtils.mockCall("isPlayer", [true]);
-          rainbowTokenTestingUtils.mockCall("getPlayer", [
-            {
-              color: {
-                r: 123,
-                g: 23,
-                b: 124,
-              },
-              originalColor: { r: 0, g: 255, b: 255 },
-              blendingPrice: ethers.utils.parseUnits("1", "ether"),
+      .mockGetLogs("PlayerJoined", [])
+      .mockCall("getPlayers", [[]]);
+
+    rainbowTokenWriteTestingUtils.mockTransaction("joinGame", undefined, {
+      triggerCallback: () => {
+        rainbowTokenReadTestingUtils.mockCall("isPlayer", [true]);
+        rainbowTokenReadTestingUtils.mockCall("getPlayer", [
+          {
+            color: {
+              r: 123,
+              g: 23,
+              b: 124,
             },
-          ]);
-        },
-      });
+            originalColor: { r: 0, g: 255, b: 255 },
+            blendingPrice: ethers.utils.parseUnits("1", "ether"),
+          },
+        ]);
+      },
+    });
 
     await connectedRender(<App />);
 
@@ -93,14 +117,14 @@ describe("Join the game", () => {
   });
 
   test("user who is already a player should have its information displayed", async () => {
-    testingUtils
+    metaMaskTestingUtils
       .mockAccounts(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"])
-      .mockChainId("0x5")
-      .mockBalance(
-        "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
-        ethers.utils.parseUnits("1").toString()
-      );
-    rainbowTokenTestingUtils
+      .mockChainId("0x5");
+    readTestingUtils.mockBalance(
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+      ethers.utils.parseUnits("1").toString()
+    );
+    rainbowTokenReadTestingUtils
       .mockCall("isPlayer", [true])
       .mockCall("getPlayer", [
         {
@@ -112,7 +136,9 @@ describe("Join the game", () => {
           originalColor: { r: 0, g: 255, b: 255 },
           blendingPrice: ethers.utils.parseUnits("1", "ether"),
         },
-      ]);
+      ])
+      .mockGetLogs("PlayerJoined", [])
+      .mockCall("getPlayers", [[]]);
 
     await connectedRender(<App />);
 

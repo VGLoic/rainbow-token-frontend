@@ -10,41 +10,62 @@ import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
+import * as chainIdUtils from "constants/chainid-map";
 
 describe("Blend with other player", () => {
-  const { provider, testingUtils } = setupEthTesting({
+  const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
+  const readTestingUtils = setupEthTesting();
 
-  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
+  const rainbowTokenReadTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
+
+  const rainbowTokenWriteTestingUtils =
+    metaMaskTestingUtils.generateContractUtils(
+      contracts.rainbowToken.getNetworkConfiguration(5).abi
+    );
 
   let originalEth: unknown;
   beforeAll(() => {
     originalEth = global.window.ethereum;
-    window.ethereum = provider;
+    window.ethereum = metaMaskTestingUtils.getProvider();
   });
 
   afterAll(() => {
     window.ethereum = originalEth;
   });
 
+  beforeEach(() => {
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+    jest
+      .spyOn(chainIdUtils, "getChainProvider")
+      .mockImplementation((_: string) => {
+        return new ethers.providers.Web3Provider(
+          readTestingUtils.getProvider() as any
+        );
+      });
+  });
+
   afterEach(() => {
-    testingUtils.clearAllMocks();
+    metaMaskTestingUtils.clearAllMocks();
+    readTestingUtils.clearAllMocks();
   });
 
   test("the connected user should be able to blend with another player", async () => {
-    testingUtils
-      .mockConnectedWallet(["0xA6d6126Ad67F6A64112FD875523AC20794e805af"], {
+    metaMaskTestingUtils.mockConnectedWallet(
+      ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
+      {
         chainId: "0x5",
-      })
-      .mockBalance(
-        "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
-        ethers.utils.parseUnits("1", "ether").toString()
-      );
+      }
+    );
+    readTestingUtils.mockBalance(
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+      ethers.utils.parseUnits("1", "ether").toString()
+    );
 
-    rainbowTokenTestingUtils
+    rainbowTokenReadTestingUtils
       .mockCall(
         "isPlayer",
         [true],
@@ -135,9 +156,9 @@ describe("Blend with other player", () => {
       within(dialog).getByLabelText(/new color rgb\(67, 127, 68\)/i)
     ).toBeInTheDocument();
 
-    rainbowTokenTestingUtils.mockTransaction("blend", undefined, {
+    rainbowTokenWriteTestingUtils.mockTransaction("blend", undefined, {
       triggerCallback: () => {
-        rainbowTokenTestingUtils.mockCall(
+        rainbowTokenReadTestingUtils.mockCall(
           "getPlayer",
           [
             {
@@ -153,7 +174,7 @@ describe("Blend with other player", () => {
           { callValues: ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"] },
           { persistent: true }
         );
-        rainbowTokenTestingUtils.mockEmitLog("Blended", [
+        rainbowTokenReadTestingUtils.mockEmitLog("Blended", [
           "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
           "0x3E61338c1a69B0d2642314C9fc6936F0B117D284",
           {

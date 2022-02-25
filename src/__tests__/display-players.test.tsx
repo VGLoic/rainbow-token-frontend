@@ -3,57 +3,34 @@ import { setupEthTesting } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import Players from "components/game/players";
-import { connectedRender } from "testing-utils";
+import * as chainIdUtils from "constants/chainid-map";
+import { wrappedRender } from "testing-utils";
 
 describe("Display player list", () => {
-  const { provider, testingUtils } = setupEthTesting({
-    providerType: "MetaMask",
-  });
+  const readTestingUtils = setupEthTesting();
 
-  const rainbowTokenTestingUtils = testingUtils.generateContractUtils(
+  const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
   );
 
-  let originalEth: unknown;
-  beforeAll(() => {
-    originalEth = global.window.ethereum;
-    window.ethereum = provider;
-  });
-
-  afterAll(() => {
-    window.ethereum = originalEth;
+  beforeEach(() => {
+    jest
+      .spyOn(chainIdUtils, "getChainProvider")
+      .mockImplementation((_: string) => {
+        return new ethers.providers.Web3Provider(
+          readTestingUtils.getProvider() as any
+        );
+      });
   });
 
   afterEach(() => {
-    testingUtils.clearAllMocks();
+    readTestingUtils.clearAllMocks();
   });
 
   test("the table should display the list of players and update with events", async () => {
-    testingUtils.mockConnectedWallet(
-      ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
-      { chainId: "0x5" }
-    );
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
 
     rainbowTokenTestingUtils
-      .mockCall("isPlayer", [true], {
-        callValues: ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
-      })
-      .mockCall(
-        "getPlayer",
-        [
-          {
-            color: {
-              r: 123,
-              g: 23,
-              b: 124,
-            },
-            originalColor: { r: 0, g: 255, b: 255 },
-            blendingPrice: ethers.utils.parseUnits("1", "ether"),
-          },
-        ],
-        { callValues: ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"] },
-        { persistent: true }
-      )
       .mockCall("getPlayers", [
         [
           {
@@ -87,7 +64,7 @@ describe("Display player list", () => {
         ],
       ]);
 
-    await connectedRender(<Players />);
+    wrappedRender(<Players />);
 
     expect(
       screen.getByRole("table", { name: /players table/i })

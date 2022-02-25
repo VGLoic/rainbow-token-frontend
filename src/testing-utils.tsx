@@ -35,3 +35,13 @@ export async function connectedRender<
   await waitForElementToBeRemoved(() => screen.getByTestId("test-loading"));
   return testUtils;
 }
+
+export function wrappedRender<
+  Q extends Queries = typeof queries,
+  Container extends Element | DocumentFragment = HTMLElement
+>(
+  ui: React.ReactElement,
+  options?: RenderOptions<Q, Container>
+): RenderResult<Q, Container> {
+  return render(ui, { wrapper: AppProviders, ...options });
+}
