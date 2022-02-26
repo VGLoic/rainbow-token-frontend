@@ -1,6 +1,9 @@
 # Rainbow Token Frontend
 
 [![Coverage Status](https://coveralls.io/repos/github/VGLoic/rainbow-token-frontend/badge.svg?branch=main)](https://coveralls.io/github/VGLoic/rainbow-token-frontend?branch=main)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/67e7351b-1c94-47e1-8f30-176605f5dcf2/deploy-status)](https://app.netlify.com/sites/rainbow-token/deploys)
+
+The application is deployed at https://rainbow-token.netlify.app/.
 
 ## Setup
 
