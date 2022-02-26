@@ -19,7 +19,7 @@ const chainIdToEndpointMap: Record<string, string> = {
 
 export const DEFAULT_CHAIN_ID = "0x5";
 
-export function getChainEndpoint(chainId: string) {
+function getChainEndpoint(chainId: string) {
   const chainEndpoint = chainIdToEndpointMap[Number(chainId)];
   if (!chainEndpoint) {
     throw new Error(`Endpoint not found for chain ID: ${chainId}`);

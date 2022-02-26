@@ -54,6 +54,13 @@
       "eslint src --max-warnings=0"
     ]
   },
+  "jest": {
+    "coveragePathIgnorePatterns":[
+      "/node_modules",
+      "src/index.tsx",
+      "src/reportWebVitals.ts"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
