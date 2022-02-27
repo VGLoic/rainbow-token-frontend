@@ -31,3 +31,10 @@ export function useReadonlyProvider() {
     return provider;
   }, [chainId]);
 }
+
+export function useMainNetProvider() {
+  return React.useMemo(() => {
+    const provider = getChainProvider("0x1");
+    return provider;
+  }, []);
+}

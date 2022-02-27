@@ -12,6 +12,7 @@ import App from "../App";
 import * as chainIdUtils from "constants/chainid-map";
 
 describe("Edit blending price", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
@@ -40,7 +41,11 @@ describe("Edit blending price", () => {
     readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -48,6 +53,7 @@ describe("Edit blending price", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });

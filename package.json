@@ -34,6 +34,7 @@
     "@types/react-dom": "^17.0.11",
     "ethers": "^5.5.4",
     "metamask-react": "^2.2.1",
+    "mnemonic-generator": "^1.0.0",
     "rainbow-token-contracts": "1.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -55,7 +56,7 @@
     ]
   },
   "jest": {
-    "coveragePathIgnorePatterns":[
+    "coveragePathIgnorePatterns": [
       "/node_modules",
       "src/index.tsx",
       "src/reportWebVitals.ts"

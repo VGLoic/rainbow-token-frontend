@@ -11,6 +11,7 @@ import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
 import * as chainIdUtils from "constants/chainid-map";
+import { capitalizedNameGenerator } from "utils";
 
 describe("Blend with other player", () => {
   const metaMaskTestingUtils = setupEthTesting({
@@ -127,7 +128,9 @@ describe("Blend with other player", () => {
 
     const table = await screen.findByRole("table", { name: /players table/i });
 
-    await within(table).findByText(/0xA6d...5af/i);
+    await within(table).findByText(
+      capitalizedNameGenerator("0xA6d6126Ad67F6A64112FD875523AC20794e805af")
+    );
     await within(table).findByLabelText(
       /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(123, 23, 124\)/i
     );
