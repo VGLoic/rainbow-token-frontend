@@ -12,8 +12,12 @@ function GameSpecifics({ style }: GameSpecificsProps) {
   const rainbowToken = useReadonlyRainbowToken();
   const { chainId } = useChainId();
 
-  const targetColorQuery = useQuery([{ chainId }, "targetColor"], () =>
-    rainbowToken.getTargetColor()
+  const targetColorQuery = useQuery(
+    [{ chainId }, "targetColor"],
+    () => rainbowToken.getTargetColor(),
+    {
+      staleTime: Infinity,
+    }
   );
 
   return (

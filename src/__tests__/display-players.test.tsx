@@ -5,8 +5,10 @@ import { contracts } from "rainbow-token-contracts";
 import Players from "components/game/players";
 import * as chainIdUtils from "constants/chainid-map";
 import { wrappedRender } from "testing-utils";
+import { capitalizedNameGenerator } from "utils";
 
 describe("Display player list", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const readTestingUtils = setupEthTesting();
 
   const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
@@ -14,9 +16,16 @@ describe("Display player list", () => {
   );
 
   beforeEach(() => {
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+    mainNetTestingUtils.mockReadonlyProvider();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -24,11 +33,19 @@ describe("Display player list", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });
 
   test("the table should display the list of players and update with events", async () => {
-    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+    mainNetTestingUtils.ens.mockEnsName(
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+      "blabla.eth"
+    );
+    mainNetTestingUtils.ens.mockEmptyReverse([
+      "0x3E61338c1a69B0d2642314C9fc6936F0B117D284",
+      "0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A",
+    ]);
 
     rainbowTokenTestingUtils
       .mockCall("getPlayers", [
@@ -70,7 +87,7 @@ describe("Display player list", () => {
       screen.getByRole("table", { name: /players table/i })
     ).toBeInTheDocument();
 
-    await screen.findByText(/0xA6d...5af/i);
+    await screen.findByText("blabla.eth");
     await screen.findByLabelText(
       /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(123, 23, 124\)/i
     );
@@ -82,7 +99,9 @@ describe("Display player list", () => {
       ).toHaveTextContent("1.0");
     });
 
-    await screen.findByText(/0x3E6...284/i);
+    await screen.findByText(
+      capitalizedNameGenerator("0x3E61338c1a69B0d2642314C9fc6936F0B117D284")
+    );
     await screen.findByLabelText(
       /0x3E61338c1a69B0d2642314C9fc6936F0B117D284 color rgb\(12, 232, 12\)/i
     );
@@ -101,9 +120,13 @@ describe("Display player list", () => {
       ]);
     });
 
-    await screen.findByText(/0x39E...c7A/i, undefined, {
-      timeout: 4500,
-    });
+    await screen.findByText(
+      capitalizedNameGenerator("0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A"),
+      undefined,
+      {
+        timeout: 4500,
+      }
+    );
     await screen.findByLabelText(/rgb\(0, 0, 0\)/i, undefined, {
       timeout: 4500,
     });

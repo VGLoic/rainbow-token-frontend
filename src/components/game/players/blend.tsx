@@ -16,6 +16,7 @@ import { mergeColors } from "utils";
 import { useMutation, useQueryClient } from "react-query";
 import BlendButton from "components/blend-button";
 import ColorToken from "components/color-token";
+import Address from "components/address";
 
 type BlendProps = {
   player: Player;
@@ -62,7 +63,15 @@ function Blend({ player, buttonStyle }: BlendProps) {
         fullWidth
       >
         <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
-          Blend with {player.account}
+          Blend with{" "}
+          <Address
+            typographyProps={{
+              ml: "8px",
+              fontSize: "inherit",
+              fontWeight: "inherit",
+            }}
+            address={player.account}
+          />
         </DialogTitle>
         {playerQuery.status === "success" ? (
           <>

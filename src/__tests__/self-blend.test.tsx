@@ -13,6 +13,7 @@ import App from "../App";
 import * as chainIdUtils from "constants/chainid-map";
 
 describe("Self blend", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
@@ -38,10 +39,18 @@ describe("Self blend", () => {
   });
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
     readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
+    mainNetTestingUtils.ens.mockAllToEmpty();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -49,6 +58,7 @@ describe("Self blend", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });

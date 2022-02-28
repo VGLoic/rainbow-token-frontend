@@ -11,8 +11,10 @@ import { contracts } from "rainbow-token-contracts";
 import App from "../App";
 import * as chainIdUtils from "constants/chainid-map";
 import { ethers } from "ethers";
+import { capitalizedNameGenerator } from "utils";
 
 describe("App connection", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
@@ -33,9 +35,18 @@ describe("App connection", () => {
   });
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
+    mainNetTestingUtils.ens.mockAllToEmpty();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -43,6 +54,7 @@ describe("App connection", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });
@@ -61,8 +73,6 @@ describe("App connection", () => {
           );
         },
       });
-
-    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
 
     rainbowTokenTestingUtils
       .mockGetLogs("PlayerJoined", [
@@ -127,7 +137,9 @@ describe("App connection", () => {
 
     expect(screen.getByText(/goerli/i)).toBeInTheDocument();
 
-    await screen.findByText(/0xA6d...5af/i);
+    await screen.findByText(
+      capitalizedNameGenerator("0xA6d6126Ad67F6A64112FD875523AC20794e805af")
+    );
     expect(
       screen.getByRole("button", { name: /join the game/i })
     ).toBeInTheDocument();

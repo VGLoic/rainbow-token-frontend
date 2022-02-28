@@ -11,8 +11,10 @@ import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
 import * as chainIdUtils from "constants/chainid-map";
+import { capitalizedNameGenerator } from "utils";
 
 describe("Blend with other player", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
@@ -38,10 +40,16 @@ describe("Blend with other player", () => {
   });
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
     readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -49,11 +57,20 @@ describe("Blend with other player", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });
 
   test("the connected user should be able to blend with another player", async () => {
+    mainNetTestingUtils.ens.mockEmptyReverse([
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+    ]);
+    mainNetTestingUtils.ens.mockEnsName(
+      "0x3E61338c1a69B0d2642314C9fc6936F0B117D284",
+      "blabla.eth"
+    );
+
     metaMaskTestingUtils.mockConnectedWallet(
       ["0xA6d6126Ad67F6A64112FD875523AC20794e805af"],
       {
@@ -127,7 +144,9 @@ describe("Blend with other player", () => {
 
     const table = await screen.findByRole("table", { name: /players table/i });
 
-    await within(table).findByText(/0xA6d...5af/i);
+    await within(table).findByText(
+      capitalizedNameGenerator("0xA6d6126Ad67F6A64112FD875523AC20794e805af")
+    );
     await within(table).findByLabelText(
       /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(123, 23, 124\)/i
     );
@@ -142,9 +161,17 @@ describe("Blend with other player", () => {
     userEvent.click(within(table).getByRole("button", { name: /blend/i }));
 
     const dialog = await screen.findByRole("dialog", {
-      name: /blend with 0x3E61338c1a69B0d2642314C9fc6936F0B117D284/i,
+      name: /blend with/i,
       hidden: false,
     });
+
+    expect(
+      screen.getByRole("heading", {
+        name: /blend with 0x3e61338c1a69b0d2642314c9fc6936f0b117d284/i,
+      })
+    ).toBeInTheDocument();
+
+    await within(dialog).findByText(/blabla.eth/i);
 
     expect(
       within(dialog).getByLabelText(/account color rgb\(123, 23, 124\)/i)

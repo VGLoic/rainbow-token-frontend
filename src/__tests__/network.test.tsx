@@ -11,6 +11,7 @@ describe("Networks", () => {
     providerType: "MetaMask",
   });
   const readTestingUtils = setupEthTesting();
+  const mainNetTestingUtils = setupEthTesting();
 
   const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
@@ -27,9 +28,18 @@ describe("Networks", () => {
   });
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
+    mainNetTestingUtils.ens.mockAllToEmpty();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -37,6 +47,7 @@ describe("Networks", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });
@@ -45,7 +56,6 @@ describe("Networks", () => {
     metaMaskTestingUtils.mockConnectedWallet([
       "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
     ]);
-    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
 
     rainbowTokenTestingUtils
       .mockGetLogs("PlayerJoined", [])

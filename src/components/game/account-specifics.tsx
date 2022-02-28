@@ -75,9 +75,14 @@ function RainbowTokenAccount({ account }: RainbowTokenAccountProps) {
 
   return (
     <>
-      <Typography component="h2" variant="h6" mb="8px">
-        <Address address={account} />
-      </Typography>
+      <Address
+        address={account}
+        typographyProps={{
+          component: "h2",
+          variant: "h6",
+          mb: "8px",
+        }}
+      />
       <Box>
         <Box
           display="flex"
