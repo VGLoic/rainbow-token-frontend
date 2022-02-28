@@ -12,6 +12,7 @@ import App from "../App";
 import * as chainIdUtils from "constants/chainid-map";
 
 describe("Join the game", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
@@ -37,10 +38,18 @@ describe("Join the game", () => {
   });
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
     readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
+    mainNetTestingUtils.ens.mockAllToEmpty();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -48,6 +57,7 @@ describe("Join the game", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });

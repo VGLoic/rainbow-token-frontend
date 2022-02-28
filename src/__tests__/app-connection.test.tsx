@@ -14,6 +14,7 @@ import { ethers } from "ethers";
 import { capitalizedNameGenerator } from "utils";
 
 describe("App connection", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const metaMaskTestingUtils = setupEthTesting({
     providerType: "MetaMask",
   });
@@ -34,9 +35,18 @@ describe("App connection", () => {
   });
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
+    mainNetTestingUtils.ens.mockAllToEmpty();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -44,6 +54,7 @@ describe("App connection", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     metaMaskTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });
@@ -62,8 +73,6 @@ describe("App connection", () => {
           );
         },
       });
-
-    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
 
     rainbowTokenTestingUtils
       .mockGetLogs("PlayerJoined", [

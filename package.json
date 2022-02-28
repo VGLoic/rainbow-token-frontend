@@ -44,7 +44,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "eth-testing": "^1.1.0-alpha.18",
+    "eth-testing": "^1.1.0-alpha.21",
     "husky": "^7.0.0",
     "lint-staged": "^11.1.2",
     "prettier": "2.4.0"

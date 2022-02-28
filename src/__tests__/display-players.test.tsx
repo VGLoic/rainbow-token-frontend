@@ -16,6 +16,9 @@ describe("Display player list", () => {
   );
 
   beforeEach(() => {
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+    mainNetTestingUtils.mockReadonlyProvider();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
       .mockImplementation((chainId: string) => {
@@ -35,8 +38,14 @@ describe("Display player list", () => {
   });
 
   test("the table should display the list of players and update with events", async () => {
-    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
-    mainNetTestingUtils.mockReadonlyProvider();
+    mainNetTestingUtils.ens.mockEnsName(
+      "0xA6d6126Ad67F6A64112FD875523AC20794e805af",
+      "blabla.eth"
+    );
+    mainNetTestingUtils.ens.mockEmptyReverse([
+      "0x3E61338c1a69B0d2642314C9fc6936F0B117D284",
+      "0x39EB1f596CB19eE8c0DFef0391BE9B7201b2ac7A",
+    ]);
 
     rainbowTokenTestingUtils
       .mockCall("getPlayers", [
@@ -78,9 +87,7 @@ describe("Display player list", () => {
       screen.getByRole("table", { name: /players table/i })
     ).toBeInTheDocument();
 
-    await screen.findByText(
-      capitalizedNameGenerator("0xA6d6126Ad67F6A64112FD875523AC20794e805af")
-    );
+    await screen.findByText("blabla.eth");
     await screen.findByLabelText(
       /0xA6d6126Ad67F6A64112FD875523AC20794e805af color rgb\(123, 23, 124\)/i
     );

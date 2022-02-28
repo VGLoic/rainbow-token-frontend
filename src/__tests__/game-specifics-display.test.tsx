@@ -7,6 +7,7 @@ import { wrappedRender } from "testing-utils";
 import * as chainIdUtils from "constants/chainid-map";
 
 describe("Game specifics display", () => {
+  const mainNetTestingUtils = setupEthTesting();
   const contractAddress =
     contracts.rainbowToken.getNetworkConfiguration(5).address;
 
@@ -17,9 +18,18 @@ describe("Game specifics display", () => {
   );
 
   beforeEach(() => {
+    mainNetTestingUtils.mockReadonlyProvider();
+    readTestingUtils.mockReadonlyProvider({ chainId: "0x5" });
+
+    mainNetTestingUtils.ens.mockAllToEmpty();
+
     jest
       .spyOn(chainIdUtils, "getChainProvider")
-      .mockImplementation((_: string) => {
+      .mockImplementation((chainId: string) => {
+        if (chainId === "0x1")
+          return new ethers.providers.Web3Provider(
+            mainNetTestingUtils.getProvider() as any
+          );
         return new ethers.providers.Web3Provider(
           readTestingUtils.getProvider() as any
         );
@@ -27,6 +37,7 @@ describe("Game specifics display", () => {
   });
 
   afterEach(() => {
+    mainNetTestingUtils.clearAllMocks();
     readTestingUtils.clearAllMocks();
   });
 
