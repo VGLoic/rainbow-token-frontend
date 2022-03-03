@@ -1,17 +1,17 @@
 import { screen, waitFor } from "@testing-library/react";
 import App from "App";
-import { setupEthTesting } from "eth-testing";
+import { generateTestingUtils } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { wrappedRender } from "testing-utils";
 import * as chainIdUtils from "constants/chainid-map";
 
 describe("Game specifics display", () => {
-  const mainNetTestingUtils = setupEthTesting();
+  const mainNetTestingUtils = generateTestingUtils();
   const contractAddress =
     contracts.rainbowToken.getNetworkConfiguration(5).address;
 
-  const readTestingUtils = setupEthTesting();
+  const readTestingUtils = generateTestingUtils();
 
   const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi

@@ -5,7 +5,7 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { setupEthTesting } from "eth-testing";
+import { generateTestingUtils } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
@@ -13,11 +13,11 @@ import App from "../App";
 import * as chainIdUtils from "constants/chainid-map";
 
 describe("Self blend", () => {
-  const mainNetTestingUtils = setupEthTesting();
-  const metaMaskTestingUtils = setupEthTesting({
+  const mainNetTestingUtils = generateTestingUtils();
+  const metaMaskTestingUtils = generateTestingUtils({
     providerType: "MetaMask",
   });
-  const readTestingUtils = setupEthTesting();
+  const readTestingUtils = generateTestingUtils();
 
   const rainbowTokenReadTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi

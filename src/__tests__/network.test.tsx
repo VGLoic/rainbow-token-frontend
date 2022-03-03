@@ -1,5 +1,5 @@
 import { screen, act } from "@testing-library/react";
-import { setupEthTesting } from "eth-testing";
+import { generateTestingUtils } from "eth-testing";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
 import App from "../App";
@@ -7,11 +7,11 @@ import * as chainIdUtils from "constants/chainid-map";
 import { ethers } from "ethers";
 
 describe("Networks", () => {
-  const metaMaskTestingUtils = setupEthTesting({
+  const metaMaskTestingUtils = generateTestingUtils({
     providerType: "MetaMask",
   });
-  const readTestingUtils = setupEthTesting();
-  const mainNetTestingUtils = setupEthTesting();
+  const readTestingUtils = generateTestingUtils();
+  const mainNetTestingUtils = generateTestingUtils();
 
   const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
