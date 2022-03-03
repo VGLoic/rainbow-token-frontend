@@ -1,5 +1,5 @@
 import { screen, act, waitFor } from "@testing-library/react";
-import { setupEthTesting } from "eth-testing";
+import { generateTestingUtils } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import Players from "components/game/players";
@@ -8,8 +8,8 @@ import { wrappedRender } from "testing-utils";
 import { capitalizedNameGenerator } from "utils";
 
 describe("Display player list", () => {
-  const mainNetTestingUtils = setupEthTesting();
-  const readTestingUtils = setupEthTesting();
+  const mainNetTestingUtils = generateTestingUtils();
+  const readTestingUtils = generateTestingUtils();
 
   const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi

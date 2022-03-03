@@ -6,7 +6,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "App";
-import { setupEthTesting } from "eth-testing";
+import { generateTestingUtils } from "eth-testing";
 import { ethers } from "ethers";
 import { contracts } from "rainbow-token-contracts";
 import { connectedRender } from "testing-utils";
@@ -14,11 +14,11 @@ import * as chainIdUtils from "constants/chainid-map";
 import { capitalizedNameGenerator } from "utils";
 
 describe("Blend with other player", () => {
-  const mainNetTestingUtils = setupEthTesting();
-  const metaMaskTestingUtils = setupEthTesting({
+  const mainNetTestingUtils = generateTestingUtils();
+  const metaMaskTestingUtils = generateTestingUtils({
     providerType: "MetaMask",
   });
-  const readTestingUtils = setupEthTesting();
+  const readTestingUtils = generateTestingUtils();
 
   const rainbowTokenReadTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi

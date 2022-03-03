@@ -5,7 +5,7 @@ import {
   within,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { setupEthTesting } from "eth-testing";
+import { generateTestingUtils } from "eth-testing";
 import AppProviders from "providers";
 import { contracts } from "rainbow-token-contracts";
 import App from "../App";
@@ -14,11 +14,11 @@ import { ethers } from "ethers";
 import { capitalizedNameGenerator } from "utils";
 
 describe("App connection", () => {
-  const mainNetTestingUtils = setupEthTesting();
-  const metaMaskTestingUtils = setupEthTesting({
+  const mainNetTestingUtils = generateTestingUtils();
+  const metaMaskTestingUtils = generateTestingUtils({
     providerType: "MetaMask",
   });
-  const readTestingUtils = setupEthTesting();
+  const readTestingUtils = generateTestingUtils();
 
   const rainbowTokenTestingUtils = readTestingUtils.generateContractUtils(
     contracts.rainbowToken.getNetworkConfiguration(5).abi
