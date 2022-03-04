@@ -3,7 +3,12 @@
 [![Coverage Status](https://coveralls.io/repos/github/VGLoic/rainbow-token-frontend/badge.svg?branch=main)](https://coveralls.io/github/VGLoic/rainbow-token-frontend?branch=main)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/67e7351b-1c94-47e1-8f30-176605f5dcf2/deploy-status)](https://app.netlify.com/sites/rainbow-token/deploys)
 
+:warning: This application has been developed for educational purposes and should not be considered as a serious product in its current state :warning:
+
 The application is deployed at https://rainbow-token.netlify.app/.
+## Smart Contracts
+
+The smart contracts are in a [different repository](https://github.com/VGLoic/rainbow-token-contracts).
 
 ## Setup
 
